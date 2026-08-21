@@ -37,6 +37,14 @@ After every code update:
 
 Do not skip invoking `$test-ui` merely because the test plan did not require changes.
 
+## Visual change review
+
+After every project file change:
+
+1. Invoke the project-specific `$present-changes-visually` skill.
+2. Generate a review of all worktree changes against `HEAD` at `_temp/visual-diff.html`.
+3. Provide a clickable absolute path using forward slashes so the user can review the page in the in-app browser.
+
 ## Git
 
 Use lightweight tags unless the user requests an annotated tag.

@@ -23,7 +23,13 @@ Generate one interactive HTML page containing every changed file as a side-by-si
 
    Replace `HEAD`, `WORKTREE`, and the output path with the requested values. The comparison points can be any Git commit-ish such as `HEAD~1`, a tag, a branch, or a commit SHA. Use `WORKTREE` for the current files.
 
-5. Confirm the command succeeded and report the absolute path to the generated page. Do not open a browser unless the user asks.
+5. Confirm the command succeeded and provide a clickable Markdown link to the generated page. On Windows, convert backslashes to forward slashes and prefix the drive path with `/`, for example:
+
+   ```markdown
+   [Open the interactive visual diff](</C:/path/to/repository/_temp/visual-diff.html>)
+   ```
+
+   Keep angle brackets around the link target so paths containing spaces remain valid. Do not open a browser unless the user asks.
 
 ## Verify output
 
