@@ -28,39 +28,44 @@ public class Rem {
             System.out.print("Me: ");
             String command = scanner.nextLine();
             System.out.println(SEPARATOR);
+            String trimmedCommand = command.trim();
 
-            if (command.equalsIgnoreCase("bye")) {
+            try {
+                if (trimmedCommand.equalsIgnoreCase("bye")) {
 
-                System.out.println("Rem: [Yawn] Need more sleep. Time for bed...");
-                System.out.println(SEPARATOR);
-                break;
-            } else if (command.equalsIgnoreCase("list")) {
-                System.out.println("Rem: Hmm... what to do now?");
-                for (int i = 0; i < addCount; i++) {
-                    System.out.println("Rem: " + (i + 1) + "." + added[i]);
+                    System.out.println("Rem: [Yawn] Need more sleep. Time for bed...");
+                    System.out.println(SEPARATOR);
+                    break;
+                } else if (trimmedCommand.equalsIgnoreCase("list")) {
+                    System.out.println("Rem: Hmm... what to do now?");
+                    for (int i = 0; i < addCount; i++) {
+                        System.out.println("Rem: " + (i + 1) + "." + added[i]);
+                    }
+                } else if (isCommand(trimmedCommand, "mark")) {
+                    int taskNumber = parseTaskNumber(trimmedCommand, "mark", addCount);
+                    Task task = added[taskNumber - 1];
+                    task.markAsDone();
+                    System.out.println("Rem: We did it! I've marked this task as done:");
+                    System.out.println("Rem: " + task);
+                } else if (isCommand(trimmedCommand, "unmark")) {
+                    int taskNumber = parseTaskNumber(trimmedCommand, "unmark", addCount);
+                    Task task = added[taskNumber - 1];
+                    task.markAsNotDone();
+                    System.out.println("Rem: Aww ok... I've marked this task as not done yet:");
+                    System.out.println("Rem: " + task);
+                } else if (isTaskCreationCommand(trimmedCommand)) {
+                    Task task = createTask(trimmedCommand);
+                    added[addCount] = task;
+                    addCount++;
+                    System.out.println("Rem: Ok! I've added this task:");
+                    System.out.println("Rem: " + task);
+                    System.out.println("Rem: Now you have " + addCount
+                            + (addCount == 1 ? " task" : " tasks") + " in the list.");
+                } else {
+                    throw new UnknownCommandException();
                 }
-            } else if (command.toLowerCase().startsWith("mark ")) {
-                int taskNumber = Integer.parseInt(command.substring(5).trim());
-                Task task = added[taskNumber - 1];
-                task.markAsDone();
-                System.out.println("Rem: We did it! I've marked this task as done:");
-                System.out.println("Rem: " + task);
-            } else if (command.toLowerCase().startsWith("unmark ")) {
-                int taskNumber = Integer.parseInt(command.substring(7).trim());
-                Task task = added[taskNumber - 1];
-                task.markAsNotDone();
-                System.out.println("Rem: Aww ok... I've marked this task as not done yet:");
-                System.out.println("Rem: " + task);
-            } else if (isTaskCreationCommand(command)) {
-                Task task = createTask(command);
-                added[addCount] = task;
-                addCount++;
-                System.out.println("Rem: Ok! I've added this task:");
-                System.out.println("Rem: " + task);
-                System.out.println("Rem: Now you have " + addCount
-                        + (addCount == 1 ? " task" : " tasks") + " in the list.");
-            } else {
-                System.out.println("Rem: Hmm... I don't know what to do with that...");
+            } catch (RemException e) {
+                System.out.println("Rem: " + e.getMessage());
             }
 
             System.out.println(SEPARATOR);
@@ -69,33 +74,99 @@ public class Rem {
         scanner.close();
     }
 
-    //Checks whether a command creates a task types
+    //Checks whether a command creates a task type
     private static boolean isTaskCreationCommand(String command) {
-        String c = command.toLowerCase();
-        return c.startsWith("todo ")
-                || c.startsWith("deadline ")
-                || c.startsWith("event ");
+        return isCommand(command, "todo")
+                || isCommand(command, "deadline")
+                || isCommand(command, "event");
     }
 
-    //Creates the appropriate task subtype
-    private static Task createTask(String command) {
+    /**
+     * Checks whether the input begins with the given command word.
+     */
+    private static boolean isCommand(String input, String commandWord) {
+        String lowerInput = input.toLowerCase();
+        return lowerInput.equals(commandWord)
+                || lowerInput.startsWith(commandWord + " ");
+    }
+
+    /**
+     * Reads and validates the task number supplied to mark or unmark.
+     */
+    private static int parseTaskNumber(String command, String commandWord,
+            int taskCount) throws InvalidTaskNumberException {
+        String numberText = command.substring(commandWord.length()).trim();
+        try {
+            int taskNumber = Integer.parseInt(numberText);
+            if (taskNumber < 1 || taskNumber > taskCount) {
+                throw new InvalidTaskNumberException();
+            }
+            return taskNumber;
+        } catch (NumberFormatException e) {
+            throw new InvalidTaskNumberException();
+        }
+    }
+
+    /**
+     * Creates the task subtype requested by a validated command word.
+     */
+    private static Task createTask(String command) throws RemException {
         String c = command.toLowerCase();
-        if (c.startsWith("todo ")) {
-            return new Todo(command.substring(5).trim());
+        if (isCommand(command, "todo")) {
+            String description = command.substring(4).trim();
+            if (description.isEmpty()) {
+                throw new EmptyDescriptionException();
+            }
+            return new Todo(description);
         }
 
-        if (c.startsWith("deadline ")) {
-            int byIndex = c.indexOf(" /by ");
-            String description = command.substring(9, byIndex).trim();
-            String by = command.substring(byIndex + 5).trim();
+        if (isCommand(command, "deadline")) {
+            String details = command.substring(8).trim();
+            if (details.isEmpty()) {
+                throw new EmptyDescriptionException();
+            }
+
+            int byIndex = c.indexOf(" /by");
+            if (byIndex < 0) {
+                throw new InvalidDeadlineFormatException();
+            }
+
+            String description = command.substring(8, byIndex).trim();
+            if (description.isEmpty()) {
+                throw new EmptyDescriptionException();
+            }
+
+            String by = command.substring(byIndex + 4).trim();
+            if (by.isEmpty()) {
+                throw new InvalidDeadlineFormatException();
+            }
             return new Deadline(description, by);
         }
 
-        int fromIndex = c.indexOf(" /from ");
-        int toIndex = c.indexOf(" /to ", fromIndex + 7);
+        String details = command.substring(5).trim();
+        if (details.isEmpty()) {
+            throw new EmptyDescriptionException();
+        }
+
+        int fromIndex = c.indexOf(" /from");
+        int toIndex = c.indexOf(" /to", Math.max(fromIndex, 0) + 6);
+        if (fromIndex < 0 || toIndex < 0 || toIndex < fromIndex) {
+            throw new InvalidEventFormatException();
+        }
+
+        if (fromIndex <= 5) {
+            throw new EmptyDescriptionException();
+        }
         String description = command.substring(6, fromIndex).trim();
-        String from = command.substring(fromIndex + 7, toIndex).trim();
-        String to = command.substring(toIndex + 5).trim();
+        if (description.isEmpty()) {
+            throw new EmptyDescriptionException();
+        }
+
+        String from = command.substring(fromIndex + 6, toIndex).trim();
+        String to = command.substring(toIndex + 4).trim();
+        if (from.isEmpty() || to.isEmpty()) {
+            throw new InvalidEventFormatException();
+        }
         return new Event(description, from, to);
     }
 }
