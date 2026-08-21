@@ -24,6 +24,7 @@ public class Rem {
 
         //Scanner picks up and responds to user input
         Scanner scanner = new Scanner(System.in);
+        commandLoop:
         while (true) {
             System.out.print("Me: ");
             String command = scanner.nextLine();
@@ -31,43 +32,52 @@ public class Rem {
             String trimmedCommand = command.trim();
 
             try {
-                if (trimmedCommand.equalsIgnoreCase("bye")) {
-
+                CommandType commandType = getCommandType(trimmedCommand);
+                switch (commandType) {
+                case BYE:
                     System.out.println("Rem: [Yawn] Need more sleep. Time for bed...");
                     System.out.println(SEPARATOR);
-                    break;
-                } else if (trimmedCommand.equalsIgnoreCase("list")) {
+                    break commandLoop;
+                case LIST:
                     System.out.println("Rem: Hmm... what to do now?");
                     for (int i = 0; i < added.size(); i++) {
                         System.out.println("Rem: " + (i + 1) + "." + added.get(i));
                     }
-                } else if (isCommand(trimmedCommand, "mark")) {
+                    break;
+                case MARK:
                     int taskNumber = parseTaskNumber(trimmedCommand, "mark", added.size());
                     Task task = added.get(taskNumber - 1);
                     task.markAsDone();
                     System.out.println("Rem: We did it! I've marked this task as done:");
                     System.out.println("Rem: " + task);
-                } else if (isCommand(trimmedCommand, "unmark")) {
-                    int taskNumber = parseTaskNumber(trimmedCommand, "unmark", added.size());
-                    Task task = added.get(taskNumber - 1);
+                    break;
+                case UNMARK:
+                    taskNumber = parseTaskNumber(trimmedCommand, "unmark", added.size());
+                    task = added.get(taskNumber - 1);
                     task.markAsNotDone();
                     System.out.println("Rem: Aww ok... I've marked this task as not done yet:");
                     System.out.println("Rem: " + task);
-                } else if (isCommand(trimmedCommand, "delete")) {
-                    int taskNumber = parseTaskNumber(trimmedCommand, "delete", added.size());
+                    break;
+                case DELETE:
+                    taskNumber = parseTaskNumber(trimmedCommand, "delete", added.size());
                     Task removedTask = added.remove(taskNumber - 1);
-                    System.out.println("Rem: Noted. I've removed this task:");
-                    System.out.println("Rem:   " + removedTask);
-                    System.out.println("Rem: Now you have " + added.size()
+                    System.out.println("Rem: One less thing to do! Removed:");
+                    System.out.println("Rem: " + removedTask);
+                    System.out.println("Rem: Now we are only left with " + added.size()
                             + (added.size() == 1 ? " task" : " tasks") + " in the list.");
-                } else if (isTaskCreationCommand(trimmedCommand)) {
-                    Task task = createTask(trimmedCommand);
+                    break;
+                case TODO:
+                case DEADLINE:
+                case EVENT:
+                    task = createTask(trimmedCommand);
                     added.add(task);
                     System.out.println("Rem: Ok! I've added this task:");
                     System.out.println("Rem: " + task);
                     System.out.println("Rem: Now you have " + added.size()
                             + (added.size() == 1 ? " task" : " tasks") + " in the list.");
-                } else {
+                    break;
+                case UNKNOWN:
+                default:
                     throw new UnknownCommandException();
                 }
             } catch (RemException e) {
@@ -80,11 +90,18 @@ public class Rem {
         scanner.close();
     }
 
-    //Checks whether a command creates a task type
-    private static boolean isTaskCreationCommand(String command) {
-        return isCommand(command, "todo")
-                || isCommand(command, "deadline")
-                || isCommand(command, "event");
+    //Identifies the appropriate CommandType from the first word of the user's input
+    private static CommandType getCommandType(String input) {
+        if (input.isBlank()) {
+            return CommandType.UNKNOWN;
+        }
+
+        String commandWord = input.split("\\s+", 2)[0].toUpperCase();
+        try {
+            return CommandType.valueOf(commandWord);
+        } catch (IllegalArgumentException e) {
+            return CommandType.UNKNOWN;
+        }
     }
 
     //Checks whether the input begins with the given command word
