@@ -5,7 +5,7 @@ public class Rem {
             "____________________________________________________________";
 
     public static void main(String[] args) {
-        String banner = " ____                      \n"
+        String banner = " ____                      \n" //Used Codex to generate ASCII
                 + "|  _ \\    ___    _ __ ___  \n"
                 + "| |_) |  / _ \\  | '_ ` _ \\ \n"
                 + "|  _ <  |  __/  | | | | | |\n"
@@ -19,7 +19,7 @@ public class Rem {
         System.out.println(SEPARATOR);
 
         //Initializes storage and counter for user input
-        String[] added = new String[100];
+        Task[] added = new Task[100];
         int addCount = 0;
 
         //Scanner to pick up user input and echo accordingly (Level-1)
@@ -35,11 +35,25 @@ public class Rem {
                 System.out.println(SEPARATOR);
                 break;
             } else if (command.equalsIgnoreCase("list")) {
+                System.out.println("Rem: Hmm... what to do now?");
                 for (int i = 0; i < addCount; i++) {
-                    System.out.println("Rem: " + (i + 1) + ". " + added[i]);
+                    System.out.println("Rem: " + (i + 1) + "." + added[i]);
                 }
+            } else if (command.toLowerCase().startsWith("mark ")) {
+                int taskNumber = Integer.parseInt(command.substring(5).trim());
+                Task task = added[taskNumber - 1];
+                task.markAsDone();
+                System.out.println("Rem: We did it! I've marked this task as done:");
+                System.out.println("Rem: " + task);
+            } else if (command.toLowerCase().startsWith("unmark ")) {
+                int taskNumber = Integer.parseInt(command.substring(7).trim());
+                Task task = added[taskNumber - 1];
+                task.markAsNotDone();
+                System.out.println("Rem: Aww ok... I've marked this task as not done yet:");
+                System.out.println("Rem: " + task);
             } else {
-                added[addCount] = command;
+                Task t = new Task(command);
+                added[addCount] = t;
                 addCount++;
                 System.out.println("Rem: added: " + command);
             }
