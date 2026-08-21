@@ -1,3 +1,4 @@
+// A task that can be marked as completed or not
 public class Task {
     protected String description;
     protected boolean isDone;

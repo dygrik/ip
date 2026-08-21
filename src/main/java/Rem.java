@@ -22,7 +22,7 @@ public class Rem {
         Task[] added = new Task[100];
         int addCount = 0;
 
-        //Scanner to pick up user input and echo accordingly (Level-1)
+        //Scanner picks up and responds to user input
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print("Me: ");
@@ -51,16 +51,51 @@ public class Rem {
                 task.markAsNotDone();
                 System.out.println("Rem: Aww ok... I've marked this task as not done yet:");
                 System.out.println("Rem: " + task);
-            } else {
-                Task t = new Task(command);
-                added[addCount] = t;
+            } else if (isTaskCreationCommand(command)) {
+                Task task = createTask(command);
+                added[addCount] = task;
                 addCount++;
-                System.out.println("Rem: added: " + command);
+                System.out.println("Rem: Ok! I've added this task:");
+                System.out.println("Rem: " + task);
+                System.out.println("Rem: Now you have " + addCount
+                        + (addCount == 1 ? " task" : " tasks") + " in the list.");
+            } else {
+                System.out.println("Rem: Hmm... I don't know what to do with that...");
             }
 
             System.out.println(SEPARATOR);
         }
 
         scanner.close();
+    }
+
+    //Checks whether a command creates a task types
+    private static boolean isTaskCreationCommand(String command) {
+        String c = command.toLowerCase();
+        return c.startsWith("todo ")
+                || c.startsWith("deadline ")
+                || c.startsWith("event ");
+    }
+
+    //Creates the appropriate task subtype
+    private static Task createTask(String command) {
+        String c = command.toLowerCase();
+        if (c.startsWith("todo ")) {
+            return new Todo(command.substring(5).trim());
+        }
+
+        if (c.startsWith("deadline ")) {
+            int byIndex = c.indexOf(" /by ");
+            String description = command.substring(9, byIndex).trim();
+            String by = command.substring(byIndex + 5).trim();
+            return new Deadline(description, by);
+        }
+
+        int fromIndex = c.indexOf(" /from ");
+        int toIndex = c.indexOf(" /to ", fromIndex + 7);
+        String description = command.substring(6, fromIndex).trim();
+        String from = command.substring(fromIndex + 7, toIndex).trim();
+        String to = command.substring(toIndex + 5).trim();
+        return new Event(description, from, to);
     }
 }
