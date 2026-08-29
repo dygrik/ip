@@ -7,9 +7,10 @@ public class ListCommand extends Command {
      *
      * @param tasks Tasks managed by Rem.
      * @param ui User interface used to display the tasks.
+     * @param storage Storage available to commands that need persistence.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui) {
+    public void execute(TaskList tasks, Ui ui, Storage storage) {
         ui.showMessage("Hmm... what to do now?");
         for (int taskNumber = 1; taskNumber <= tasks.size(); taskNumber++) {
             ui.showMessage(taskNumber + "." + tasks.getTask(taskNumber));

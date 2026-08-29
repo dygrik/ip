@@ -20,12 +20,13 @@ public class UnmarkCommand extends Command {
      *
      * @param tasks Tasks managed by Rem.
      * @param ui User interface used to display the result.
+     * @param storage Storage used to save the updated task list.
      * @throws IOException If the updated task list cannot be saved.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui) throws IOException {
+    public void execute(TaskList tasks, Ui ui, Storage storage) throws IOException {
         Task task = tasks.unmark(taskNumber);
-        Storage.saveTasks(tasks.getTasks());
+        storage.saveTasks(tasks.getTasks());
         ui.showMessage("Aww ok... I've marked this task as not done yet:");
         ui.showMessage(task.toString());
     }

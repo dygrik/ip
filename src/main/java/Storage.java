@@ -9,7 +9,16 @@ import java.util.List;
  * Loads and saves Rem's tasks using a local data file.
  */
 public class Storage {
-    private static final Path DATA_FILE = Path.of("data", "rem.txt");
+    private final Path dataFile;
+
+    /**
+     * Creates storage that uses the specified data file.
+     *
+     * @param filePath Path of the task data file.
+     */
+    public Storage(String filePath) {
+        dataFile = Path.of(filePath);
+    }
 
     /**
      * Loads all tasks from the data file.
@@ -17,13 +26,13 @@ public class Storage {
      * @return Tasks reconstructed from the saved data, or an empty list if no data file exists.
      * @throws IOException If the data file cannot be read or contains an unknown task type.
      */
-    public static ArrayList<Task> loadTasks() throws IOException {
+    public ArrayList<Task> loadTasks() throws IOException {
         ArrayList<Task> tasks = new ArrayList<>();
-        if (Files.notExists(DATA_FILE)) {
+        if (Files.notExists(dataFile)) {
             return tasks;
         }
 
-        List<String> taskLines = Files.readAllLines(DATA_FILE);
+        List<String> taskLines = Files.readAllLines(dataFile);
         for (int i = 0; i < taskLines.size(); i++) {
             String taskLine = taskLines.get(i);
             if (taskLine.isBlank()) {
@@ -46,14 +55,17 @@ public class Storage {
      * @param tasks Current tasks to save.
      * @throws IOException If the data directory or file cannot be written.
      */
-    public static void saveTasks(List<Task> tasks) throws IOException {
-        Files.createDirectories(DATA_FILE.getParent());
+    public void saveTasks(List<Task> tasks) throws IOException {
+        Path parentDirectory = dataFile.getParent();
+        if (parentDirectory != null) {
+            Files.createDirectories(parentDirectory);
+        }
 
         List<String> taskLines = new ArrayList<>();
         for (Task task : tasks) {
             taskLines.add(toDataLine(task));
         }
-        Files.write(DATA_FILE, taskLines);
+        Files.write(dataFile, taskLines);
     }
 
     private static String toDataLine(Task task) {

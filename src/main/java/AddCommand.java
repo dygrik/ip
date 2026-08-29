@@ -20,12 +20,13 @@ public class AddCommand extends Command {
      *
      * @param tasks Tasks managed by Rem.
      * @param ui User interface used to display the result.
+     * @param storage Storage used to save the updated task list.
      * @throws IOException If the updated task list cannot be saved.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui) throws IOException {
+    public void execute(TaskList tasks, Ui ui, Storage storage) throws IOException {
         tasks.add(task);
-        Storage.saveTasks(tasks.getTasks());
+        storage.saveTasks(tasks.getTasks());
         ui.showMessage("Ok! I've added this task:");
         ui.showMessage(task.toString());
         ui.showMessage("Now you have " + tasks.size()

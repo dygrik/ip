@@ -20,12 +20,13 @@ public class DeleteCommand extends Command {
      *
      * @param tasks Tasks managed by Rem.
      * @param ui User interface used to display the result.
+     * @param storage Storage used to save the updated task list.
      * @throws IOException If the updated task list cannot be saved.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui) throws IOException {
+    public void execute(TaskList tasks, Ui ui, Storage storage) throws IOException {
         Task removedTask = tasks.delete(taskNumber);
-        Storage.saveTasks(tasks.getTasks());
+        storage.saveTasks(tasks.getTasks());
         ui.showMessage("One less thing to do! Removed:");
         ui.showMessage(removedTask.toString());
         ui.showMessage("Now we are only left with " + tasks.size()

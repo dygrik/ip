@@ -7,9 +7,10 @@ public class ExitCommand extends Command {
      *
      * @param tasks Tasks managed by Rem.
      * @param ui User interface used to display the farewell.
+     * @param storage Storage available to commands that need persistence.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui) {
+    public void execute(TaskList tasks, Ui ui, Storage storage) {
         ui.showMessage("[Yawn] Need more sleep. Time for bed...");
     }
 

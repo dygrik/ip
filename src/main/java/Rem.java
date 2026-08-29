@@ -2,10 +2,11 @@ import java.io.IOException;
 
 public class Rem {
     public static void main(String[] args) {
+        Storage storage = new Storage("data/rem.txt");
         TaskList tasks;
         boolean hasLoadError = false;
         try {
-            tasks = new TaskList(Storage.loadTasks());
+            tasks = new TaskList(storage.loadTasks());
         } catch (IOException e) {
             tasks = new TaskList();
             hasLoadError = true;
@@ -20,13 +21,12 @@ public class Rem {
 
             try {
                 Command parsedCommand = Parser.parse(command, tasks.size());
-                parsedCommand.execute(tasks, ui);
+                parsedCommand.execute(tasks, ui, storage);
                 isExit = parsedCommand.isExit();
             } catch (RemException e) {
                 ui.showMessage(e.getMessage());
             } catch (IOException e) {
-                ui.showMessage("Rem is having trouble saving your tasks... "
-                        + "Something might be wrong with your data folder");
+                ui.showMessage("I couldn't save your tasks. Please check the data folder.");
             } finally {
                 ui.showSeparator();
             }
