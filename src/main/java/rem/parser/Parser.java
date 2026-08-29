@@ -3,6 +3,7 @@ package rem.parser;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.Locale;
 
 import rem.command.AddCommand;
 import rem.command.Command;
@@ -65,7 +66,7 @@ public class Parser {
             return CommandType.UNKNOWN;
         }
 
-        String commandWord = input.split("\\s+", 2)[0].toUpperCase();
+        String commandWord = input.split("\\s+", 2)[0].toUpperCase(Locale.ROOT);
         try {
             return CommandType.valueOf(commandWord);
         } catch (IllegalArgumentException e) {
@@ -137,7 +138,7 @@ public class Parser {
      * @throws RemException If the task description or date-time arguments are invalid.
      */
     public static Task createTask(String command) throws RemException {
-        String lowerCommand = command.toLowerCase();
+        String lowerCommand = command.toLowerCase(Locale.ROOT);
         if (isCommand(command, "todo")) {
             String description = command.substring(4).trim();
             if (description.isEmpty()) {
@@ -153,7 +154,7 @@ public class Parser {
     }
 
     private static boolean isCommand(String input, String commandWord) {
-        String lowerInput = input.toLowerCase();
+        String lowerInput = input.toLowerCase(Locale.ROOT);
         return lowerInput.equals(commandWord)
                 || lowerInput.startsWith(commandWord + " ");
     }
