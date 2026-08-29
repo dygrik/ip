@@ -1,9 +1,17 @@
+package rem.storage;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+
+import rem.task.Deadline;
+import rem.task.Event;
+import rem.task.Task;
+import rem.task.TaskDateTime;
+import rem.task.Todo;
 
 /**
  * Loads and saves Rem's tasks using a local data file.
@@ -69,17 +77,17 @@ public class Storage {
     }
 
     private static String toDataLine(Task task) {
-        String status = task.isDone ? "1" : "0";
+        String status = task.isDone() ? "1" : "0";
         if (task instanceof Deadline deadline) {
-            return "D | " + status + " | " + deadline.description + " | "
-                    + TaskDateTime.formatForStorage(deadline.by);
+            return "D | " + status + " | " + deadline.getDescription() + " | "
+                    + TaskDateTime.formatForStorage(deadline.getBy());
         }
         if (task instanceof Event event) {
-            return "E | " + status + " | " + event.description + " | "
-                    + TaskDateTime.formatForStorage(event.from) + " | "
-                    + TaskDateTime.formatForStorage(event.to);
+            return "E | " + status + " | " + event.getDescription() + " | "
+                    + TaskDateTime.formatForStorage(event.getFrom()) + " | "
+                    + TaskDateTime.formatForStorage(event.getTo());
         }
-        return "T | " + status + " | " + task.description;
+        return "T | " + status + " | " + task.getDescription();
     }
 
     private static Task createTask(String[] taskParts, int lineNumber) throws IOException {

@@ -1,22 +1,30 @@
+package rem.command;
+
 import java.io.IOException;
 
+import rem.exception.InvalidTaskNumberException;
+import rem.storage.Storage;
+import rem.task.Task;
+import rem.task.TaskList;
+import rem.ui.Ui;
+
 /**
- * Removes a task from the task list.
+ * Marks a task as not completed.
  */
-public class DeleteCommand extends Command {
+public class UnmarkCommand extends Command {
     private final int taskNumber;
 
     /**
      * Creates a command for a selected task.
      *
-     * @param taskNumber One-based number of the task to delete.
+     * @param taskNumber One-based number of the task to unmark.
      */
-    public DeleteCommand(int taskNumber) {
+    public UnmarkCommand(int taskNumber) {
         this.taskNumber = taskNumber;
     }
 
     /**
-     * Deletes the task, saves the task list, and displays the result.
+     * Unmarks the task, saves the task list, and displays the result.
      *
      * @param tasks Tasks managed by Rem.
      * @param ui User interface used to display the result.
@@ -27,11 +35,9 @@ public class DeleteCommand extends Command {
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage)
             throws IOException, InvalidTaskNumberException {
-        Task removedTask = tasks.delete(taskNumber);
+        Task task = tasks.unmark(taskNumber);
         storage.saveTasks(tasks.getTasks());
-        ui.showMessage("One less thing to do! Removed:");
-        ui.showMessage(removedTask.toString());
-        ui.showMessage("Now we are only left with " + tasks.size()
-                + (tasks.size() == 1 ? " task" : " tasks") + " in the list.");
+        ui.showMessage("Aww ok... I've marked this task as not done yet:");
+        ui.showMessage(task.toString());
     }
 }

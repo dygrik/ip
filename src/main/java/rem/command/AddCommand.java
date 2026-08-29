@@ -1,4 +1,11 @@
+package rem.command;
+
 import java.io.IOException;
+
+import rem.storage.Storage;
+import rem.task.Task;
+import rem.task.TaskList;
+import rem.ui.Ui;
 
 /**
  * Adds a task to the task list.

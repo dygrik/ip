@@ -1,3 +1,5 @@
+package rem.task;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -19,6 +21,14 @@ public class Event extends Task {
         super(description);
         this.from = from;
         this.to = to;
+    }
+
+    public LocalDateTime getFrom() {
+        return from;
+    }
+
+    public LocalDateTime getTo() {
+        return to;
     }
 
     /**

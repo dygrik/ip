@@ -1,3 +1,5 @@
+package rem.exception;
+
 /**
  * Indicates that a deadline command does not contain valid due information.
  */

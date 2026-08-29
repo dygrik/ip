@@ -1,3 +1,5 @@
+package rem.exception;
+
 /**
  * Indicates that an event command does not contain a valid start and end time.
  */

@@ -1,6 +1,10 @@
+package rem.task;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import rem.exception.InvalidTaskNumberException;
 
 /**
  * Stores Rem's tasks and provides operations for managing them.

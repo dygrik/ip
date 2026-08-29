@@ -1,3 +1,5 @@
+package rem.exception;
+
 /**
  * Indicates that the user entered a command that Rem does not recognize.
  */

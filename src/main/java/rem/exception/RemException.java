@@ -1,3 +1,5 @@
+package rem.exception;
+
 /**
  * Represents an expected error caused by invalid user input to Rem.
  */

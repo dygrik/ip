@@ -1,3 +1,5 @@
+package rem.exception;
+
 /**
  * Indicates that a task creation command does not contain a task description.
  */

@@ -1,4 +1,11 @@
+package rem.command;
+
 import java.io.IOException;
+
+import rem.exception.RemException;
+import rem.storage.Storage;
+import rem.task.TaskList;
+import rem.ui.Ui;
 
 /**
  * Represents an instruction that can be executed by Rem.

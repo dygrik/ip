@@ -1,3 +1,5 @@
+package rem.task;
+
 // A task that can be marked as completed or not
 public class Task {
     protected String description;
@@ -12,6 +14,14 @@ public class Task {
     //Returns the icon used to show whether this task is complete
     public String getStatusIcon() {
         return this.isDone ? "X" : " ";
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public boolean isDone() {
+        return isDone;
     }
 
     //Marks task as complete

@@ -1,3 +1,5 @@
+package rem.exception;
+
 /**
  * Indicates that a command does not contain a valid date.
  */

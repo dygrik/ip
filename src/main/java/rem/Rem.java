@@ -1,4 +1,13 @@
+package rem;
+
 import java.io.IOException;
+
+import rem.command.Command;
+import rem.exception.RemException;
+import rem.parser.Parser;
+import rem.storage.Storage;
+import rem.task.TaskList;
+import rem.ui.Ui;
 
 /**
  * Coordinates Rem's user interface, task list, storage, and commands.

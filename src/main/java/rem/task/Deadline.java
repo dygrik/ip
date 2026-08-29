@@ -1,3 +1,5 @@
+package rem.task;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -16,6 +18,10 @@ public class Deadline extends Task {
     public Deadline(String description, LocalDateTime by) {
         super(description);
         this.by = by;
+    }
+
+    public LocalDateTime getBy() {
+        return by;
     }
 
     /**
