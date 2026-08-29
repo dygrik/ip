@@ -1,7 +1,7 @@
 package rem.command;
 
 /**
- * Identifies the command words understood by Rem.
+ * Lists all command types understood by Rem.
  */
 public enum CommandType {
     BYE,
