@@ -1,0 +1,34 @@
+import java.io.IOException;
+
+/**
+ * Adds a task to the task list.
+ */
+public class AddCommand extends Command {
+    private final Task task;
+
+    /**
+     * Creates a command for an already-parsed task.
+     *
+     * @param task Task to add.
+     */
+    public AddCommand(Task task) {
+        this.task = task;
+    }
+
+    /**
+     * Adds the task, saves the task list, and displays the result.
+     *
+     * @param tasks Tasks managed by Rem.
+     * @param ui User interface used to display the result.
+     * @throws IOException If the updated task list cannot be saved.
+     */
+    @Override
+    public void execute(TaskList tasks, Ui ui) throws IOException {
+        tasks.add(task);
+        Storage.saveTasks(tasks.getTasks());
+        ui.showMessage("Ok! I've added this task:");
+        ui.showMessage(task.toString());
+        ui.showMessage("Now you have " + tasks.size()
+                + (tasks.size() == 1 ? " task" : " tasks") + " in the list.");
+    }
+}

@@ -57,12 +57,8 @@ public class Rem {
                 case DEADLINE:
                 case EVENT:
                     Task task = Parser.createTask(trimmedCommand);
-                    tasks.add(task);
-                    Storage.saveTasks(tasks.getTasks());
-                    ui.showMessage("Ok! I've added this task:");
-                    ui.showMessage(task.toString());
-                    ui.showMessage("Now you have " + tasks.size()
-                            + (tasks.size() == 1 ? " task" : " tasks") + " in the list.");
+                    Command addCommand = new AddCommand(task);
+                    addCommand.execute(tasks, ui);
                     break;
                 case UNKNOWN:
                 default:
