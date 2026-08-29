@@ -1,18 +1,39 @@
 import java.io.IOException;
 
+/**
+ * Coordinates Rem's user interface, task list, storage, and commands.
+ */
 public class Rem {
-    public static void main(String[] args) {
-        Storage storage = new Storage("data/rem.txt");
-        TaskList tasks;
-        boolean hasLoadError = false;
-        try {
-            tasks = new TaskList(storage.loadTasks());
-        } catch (IOException e) {
-            tasks = new TaskList();
-            hasLoadError = true;
-        }
+    private final Storage storage;
+    private final TaskList tasks;
+    private final Ui ui;
+    private final boolean hasLoadError;
 
-        Ui ui = new Ui();
+    /**
+     * Creates Rem and loads tasks from the specified data file.
+     *
+     * @param filePath Path of the task data file.
+     */
+    public Rem(String filePath) {
+        storage = new Storage(filePath);
+        ui = new Ui();
+
+        TaskList loadedTasks;
+        boolean didLoadingFail = false;
+        try {
+            loadedTasks = new TaskList(storage.loadTasks());
+        } catch (IOException e) {
+            loadedTasks = new TaskList();
+            didLoadingFail = true;
+        }
+        tasks = loadedTasks;
+        hasLoadError = didLoadingFail;
+    }
+
+    /**
+     * Runs the command loop until the user exits or input ends.
+     */
+    public void run() {
         ui.showWelcome(hasLoadError);
 
         boolean isExit = false;
@@ -35,4 +56,12 @@ public class Rem {
         ui.close();
     }
 
+    /**
+     * Starts Rem using its default data file.
+     *
+     * @param args Command-line arguments, which are not used.
+     */
+    public static void main(String[] args) {
+        new Rem("data/rem.txt").run();
+    }
 }
