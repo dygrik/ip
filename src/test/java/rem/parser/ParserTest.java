@@ -65,6 +65,16 @@ public class ParserTest {
     }
 
     @Test
+    public void parseKeyword_validKeyword_keywordReturned() throws EmptyDescriptionException {
+        assertEquals("read book", Parser.parseKeyword("find   read book"));
+    }
+
+    @Test
+    public void parseKeyword_missingKeyword_exceptionThrown() {
+        assertThrows(EmptyDescriptionException.class, () -> Parser.parseKeyword("find"));
+    }
+
+    @Test
     public void createTask_validTodo_todoReturned() throws RemException {
         Task task = Parser.createTask("ToDo read book");
 

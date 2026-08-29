@@ -4,6 +4,7 @@ package rem.command;
 public enum CommandType {
     BYE,
     LIST,
+    FIND,
     ON,
     MARK,
     UNMARK,

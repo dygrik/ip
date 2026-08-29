@@ -9,6 +9,7 @@ import rem.command.Command;
 import rem.command.CommandType;
 import rem.command.DeleteCommand;
 import rem.command.ExitCommand;
+import rem.command.FindCommand;
 import rem.command.ListCommand;
 import rem.command.MarkCommand;
 import rem.command.OnCommand;
@@ -43,6 +44,7 @@ public class Parser {
         return switch (commandType) {
         case BYE -> new ExitCommand();
         case LIST -> new ListCommand();
+        case FIND -> new FindCommand(parseKeyword(command));
         case ON -> new OnCommand(parseDate(command));
         case MARK -> new MarkCommand(parseTaskNumber(command, "mark"));
         case UNMARK -> new UnmarkCommand(parseTaskNumber(command, "unmark"));
@@ -110,6 +112,21 @@ public class Parser {
         } catch (DateTimeParseException e) {
             throw new InvalidDateException();
         }
+    }
+
+    /**
+     * Reads the keyword supplied to a {@code find} command.
+     *
+     * @param command Full user command.
+     * @return Keyword to search for.
+     * @throws EmptyDescriptionException If no keyword is supplied.
+     */
+    public static String parseKeyword(String command) throws EmptyDescriptionException {
+        String keyword = command.substring(4).trim();
+        if (keyword.isEmpty()) {
+            throw new EmptyDescriptionException();
+        }
+        return keyword;
     }
 
     /**
