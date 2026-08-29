@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -178,7 +180,11 @@ public class Rem {
             if (by.isEmpty()) {
                 throw new InvalidDeadlineFormatException();
             }
-            return new Deadline(description, by);
+            try {
+                return new Deadline(description, TaskDateTime.parse(by));
+            } catch (DateTimeParseException e) {
+                throw new InvalidDeadlineFormatException();
+            }
         }
 
         String details = command.substring(5).trim();
@@ -205,6 +211,15 @@ public class Rem {
         if (from.isEmpty() || to.isEmpty()) {
             throw new InvalidEventFormatException();
         }
-        return new Event(description, from, to);
+        try {
+            LocalDateTime startDateTime = TaskDateTime.parse(from);
+            LocalDateTime endDateTime = TaskDateTime.parse(to);
+            if (endDateTime.isBefore(startDateTime)) {
+                throw new InvalidEventFormatException();
+            }
+            return new Event(description, startDateTime, endDateTime);
+        } catch (DateTimeParseException e) {
+            throw new InvalidEventFormatException();
+        }
     }
 }

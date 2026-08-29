@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,11 +59,13 @@ public class Storage {
     private static String toDataLine(Task task) {
         String status = task.isDone ? "1" : "0";
         if (task instanceof Deadline deadline) {
-            return "D | " + status + " | " + deadline.description + " | " + deadline.by;
+            return "D | " + status + " | " + deadline.description + " | "
+                    + TaskDateTime.formatForStorage(deadline.by);
         }
         if (task instanceof Event event) {
-            return "E | " + status + " | " + event.description + " | " + event.from
-                    + " | " + event.to;
+            return "E | " + status + " | " + event.description + " | "
+                    + TaskDateTime.formatForStorage(event.from) + " | "
+                    + TaskDateTime.formatForStorage(event.to);
         }
         return "T | " + status + " | " + task.description;
     }
@@ -79,11 +82,20 @@ public class Storage {
         }
         case "D" -> {
             validateParts(taskParts, 4, lineNumber);
-            yield new Deadline(taskParts[2], taskParts[3]);
+            try {
+                yield new Deadline(taskParts[2], TaskDateTime.parse(taskParts[3]));
+            } catch (DateTimeParseException e) {
+                throw invalidDataLine(lineNumber);
+            }
         }
         case "E" -> {
             validateParts(taskParts, 5, lineNumber);
-            yield new Event(taskParts[2], taskParts[3], taskParts[4]);
+            try {
+                yield new Event(taskParts[2], TaskDateTime.parse(taskParts[3]),
+                        TaskDateTime.parse(taskParts[4]));
+            } catch (DateTimeParseException e) {
+                throw invalidDataLine(lineNumber);
+            }
         }
         default -> throw invalidDataLine(lineNumber);
         };

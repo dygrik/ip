@@ -1,10 +1,20 @@
-//A task that happens between a start and end date/time
-public class Event extends Task {
-    protected String from;
-    protected String to;
+import java.time.LocalDateTime;
 
-    //Creates an event
-    public Event(String description, String from, String to) {
+/**
+ * A task that happens between a start and end date/time.
+ */
+public class Event extends Task {
+    protected LocalDateTime from;
+    protected LocalDateTime to;
+
+    /**
+     * Creates an event.
+     *
+     * @param description Description of the event.
+     * @param from Date and time at which the event starts.
+     * @param to Date and time at which the event ends.
+     */
+    public Event(String description, LocalDateTime from, LocalDateTime to) {
         super(description);
         this.from = from;
         this.to = to;
@@ -12,6 +22,7 @@ public class Event extends Task {
 
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (from: " + from + " to: " + to + ")";
+        return "[E]" + super.toString() + " (from: " + TaskDateTime.format(from)
+                + " to: " + TaskDateTime.format(to) + ")";
     }
 }
