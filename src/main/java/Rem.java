@@ -1,15 +1,15 @@
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.List;
 
 public class Rem {
     public static void main(String[] args) {
-        ArrayList<Task> added;
+        TaskList tasks;
         boolean hasLoadError = false;
         try {
-            added = Storage.loadTasks();
+            tasks = new TaskList(Storage.loadTasks());
         } catch (IOException e) {
-            added = new ArrayList<>();
+            tasks = new TaskList();
             hasLoadError = true;
         }
 
@@ -30,13 +30,13 @@ public class Rem {
                     break commandLoop;
                 case LIST:
                     ui.showMessage("Hmm... what to do now?");
-                    for (int i = 0; i < added.size(); i++) {
-                        ui.showMessage((i + 1) + "." + added.get(i));
+                    for (int i = 1; i <= tasks.size(); i++) {
+                        ui.showMessage(i + "." + tasks.getTask(i));
                     }
                     break;
                 case ON:
                     LocalDate date = Parser.parseDate(trimmedCommand);
-                    ArrayList<Task> scheduledTasks = findTasksOn(added, date);
+                    List<Task> scheduledTasks = tasks.findTasksOn(date);
                     if (scheduledTasks.isEmpty()) {
                         ui.showMessage("You are free on " + TaskDateTime.format(date) + "!");
                         break;
@@ -47,40 +47,38 @@ public class Rem {
                     }
                     break;
                 case MARK:
-                    int taskNumber = Parser.parseTaskNumber(trimmedCommand, "mark", added.size());
-                    Task task = added.get(taskNumber - 1);
-                    task.markAsDone();
-                    Storage.saveTasks(added);
+                    int taskNumber = Parser.parseTaskNumber(trimmedCommand, "mark", tasks.size());
+                    Task task = tasks.mark(taskNumber);
+                    Storage.saveTasks(tasks.getTasks());
                     ui.showMessage("We did it! I've marked this task as done:");
                     ui.showMessage(task.toString());
                     break;
                 case UNMARK:
-                    taskNumber = Parser.parseTaskNumber(trimmedCommand, "unmark", added.size());
-                    task = added.get(taskNumber - 1);
-                    task.markAsNotDone();
-                    Storage.saveTasks(added);
+                    taskNumber = Parser.parseTaskNumber(trimmedCommand, "unmark", tasks.size());
+                    task = tasks.unmark(taskNumber);
+                    Storage.saveTasks(tasks.getTasks());
                     ui.showMessage("Aww ok... I've marked this task as not done yet:");
                     ui.showMessage(task.toString());
                     break;
                 case DELETE:
-                    taskNumber = Parser.parseTaskNumber(trimmedCommand, "delete", added.size());
-                    Task removedTask = added.remove(taskNumber - 1);
-                    Storage.saveTasks(added);
+                    taskNumber = Parser.parseTaskNumber(trimmedCommand, "delete", tasks.size());
+                    Task removedTask = tasks.delete(taskNumber);
+                    Storage.saveTasks(tasks.getTasks());
                     ui.showMessage("One less thing to do! Removed:");
                     ui.showMessage(removedTask.toString());
-                    ui.showMessage("Now we are only left with " + added.size()
-                            + (added.size() == 1 ? " task" : " tasks") + " in the list.");
+                    ui.showMessage("Now we are only left with " + tasks.size()
+                            + (tasks.size() == 1 ? " task" : " tasks") + " in the list.");
                     break;
                 case TODO:
                 case DEADLINE:
                 case EVENT:
                     task = Parser.createTask(trimmedCommand);
-                    added.add(task);
-                    Storage.saveTasks(added);
+                    tasks.add(task);
+                    Storage.saveTasks(tasks.getTasks());
                     ui.showMessage("Ok! I've added this task:");
                     ui.showMessage(task.toString());
-                    ui.showMessage("Now you have " + added.size()
-                            + (added.size() == 1 ? " task" : " tasks") + " in the list.");
+                    ui.showMessage("Now you have " + tasks.size()
+                            + (tasks.size() == 1 ? " task" : " tasks") + " in the list.");
                     break;
                 case UNKNOWN:
                 default:
@@ -97,18 +95,6 @@ public class Rem {
         }
 
         ui.close();
-    }
-
-    // Finds deadlines due and events occurring on the given date.
-    private static ArrayList<Task> findTasksOn(ArrayList<Task> tasks, LocalDate date) {
-        ArrayList<Task> scheduledTasks = new ArrayList<>();
-        for (Task task : tasks) {
-            if (task instanceof Deadline deadline && deadline.occursOn(date)
-                    || task instanceof Event event && event.occursOn(date)) {
-                scheduledTasks.add(task);
-            }
-        }
-        return scheduledTasks;
     }
 
 }
