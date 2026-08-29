@@ -50,12 +50,8 @@ public class Rem {
                     break;
                 case DELETE:
                     taskNumber = Parser.parseTaskNumber(trimmedCommand, "delete", tasks.size());
-                    Task removedTask = tasks.delete(taskNumber);
-                    Storage.saveTasks(tasks.getTasks());
-                    ui.showMessage("One less thing to do! Removed:");
-                    ui.showMessage(removedTask.toString());
-                    ui.showMessage("Now we are only left with " + tasks.size()
-                            + (tasks.size() == 1 ? " task" : " tasks") + " in the list.");
+                    Command deleteCommand = new DeleteCommand(taskNumber);
+                    deleteCommand.execute(tasks, ui);
                     break;
                 case TODO:
                 case DEADLINE:
