@@ -1,4 +1,7 @@
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -57,6 +60,20 @@ public class Rem {
                     System.out.println("Rem: Hmm... what to do now?");
                     for (int i = 0; i < added.size(); i++) {
                         System.out.println("Rem: " + (i + 1) + "." + added.get(i));
+                    }
+                    break;
+                case ON:
+                    LocalDate date = parseDate(trimmedCommand);
+                    ArrayList<Task> scheduledTasks = findTasksOn(added, date);
+                    if (scheduledTasks.isEmpty()) {
+                        System.out.println("Rem: Nothing is scheduled on "
+                                + TaskDateTime.format(date) + ".");
+                        break;
+                    }
+                    System.out.println("Rem: Here's what's scheduled on "
+                            + TaskDateTime.format(date) + ":");
+                    for (int i = 0; i < scheduledTasks.size(); i++) {
+                        System.out.println("Rem: " + (i + 1) + "." + scheduledTasks.get(i));
                     }
                     break;
                 case MARK:
@@ -147,6 +164,31 @@ public class Rem {
         }
     }
 
+    // Reads the date supplied to the on command.
+    private static LocalDate parseDate(String command) throws InvalidDateException {
+        String dateText = command.substring(2).trim();
+        if (dateText.isEmpty() || dateText.contains(" ")) {
+            throw new InvalidDateException();
+        }
+        try {
+            return TaskDateTime.parse(dateText).toLocalDate();
+        } catch (DateTimeParseException e) {
+            throw new InvalidDateException();
+        }
+    }
+
+    // Finds deadlines due and events occurring on the given date.
+    private static ArrayList<Task> findTasksOn(ArrayList<Task> tasks, LocalDate date) {
+        ArrayList<Task> scheduledTasks = new ArrayList<>();
+        for (Task task : tasks) {
+            if (task instanceof Deadline deadline && deadline.occursOn(date)
+                    || task instanceof Event event && event.occursOn(date)) {
+                scheduledTasks.add(task);
+            }
+        }
+        return scheduledTasks;
+    }
+
     //Creates the task subtype requested by a command word
     private static Task createTask(String command) throws RemException {
         String c = command.toLowerCase();
@@ -178,7 +220,11 @@ public class Rem {
             if (by.isEmpty()) {
                 throw new InvalidDeadlineFormatException();
             }
-            return new Deadline(description, by);
+            try {
+                return new Deadline(description, TaskDateTime.parse(by));
+            } catch (DateTimeParseException e) {
+                throw new InvalidDeadlineFormatException();
+            }
         }
 
         String details = command.substring(5).trim();
@@ -205,6 +251,15 @@ public class Rem {
         if (from.isEmpty() || to.isEmpty()) {
             throw new InvalidEventFormatException();
         }
-        return new Event(description, from, to);
+        try {
+            LocalDateTime startDateTime = TaskDateTime.parse(from);
+            LocalDateTime endDateTime = TaskDateTime.parse(to);
+            if (endDateTime.isBefore(startDateTime)) {
+                throw new InvalidEventFormatException();
+            }
+            return new Event(description, startDateTime, endDateTime);
+        } catch (DateTimeParseException e) {
+            throw new InvalidEventFormatException();
+        }
     }
 }
