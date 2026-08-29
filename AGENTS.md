@@ -30,7 +30,14 @@ Ensure that Java 25 is used when running the application or build tasks. On macO
 
 ## Coding and Git conventions
 
-Follow the conventions summarized below. Consult the linked guides when a case is not covered here, and use the Google Java Style Guide for Java topics that the Java guide does not cover.
+For every Java code change, invoke and follow the project-specific
+`$seedu-java-coding-standard` skill. The skill and conventions summarized below apply to all Java
+code in this project. Consult the linked guides when a case is not covered here, and use the Google
+Java Style Guide for Java topics that the Java guide does not cover.
+
+Before creating or proposing any commit, invoke and follow the project-specific
+`$seedu-git-standard` skill. All future commits and commit messages in this project must comply with
+that skill. Do not commit or push unless the user explicitly asks.
 
 * Java: <https://se-education.org/guides/conventions/java/intermediate.html>
 * Git: <https://se-education.org/guides/conventions/git.html>
