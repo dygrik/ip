@@ -52,6 +52,17 @@ Follow the conventions summarized below. Consult the linked guides when a case i
 * Give non-trivial commits a body separated from the subject by a blank line. Wrap body text at 72 characters and explain what changed and why, rather than narrating implementation details.
 * Keep commits focused. If a commit message becomes overly long, split the work into smaller coherent commits.
 
+## JUnit testing
+
+Maintain JUnit tests for approximately the top 50% highest-value methods in the codebase. Prioritize
+methods containing complex logic, core application behavior, validation, state changes, persistence,
+and other critical business rules. Do not add tests solely to meet the target for trivial getters,
+setters, constructors, or simple delegation methods.
+
+After every code change, reassess the affected methods and update the JUnit tests as needed to keep
+the test suite accurate and compliant with this 50% high-value-method coverage target. Run the
+applicable Gradle test task and resolve any failures before considering the change complete.
+
 ## UI testing
 
 After every code update:
