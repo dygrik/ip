@@ -91,6 +91,17 @@ public class TaskListTest {
     }
 
     @Test
+    public void findTasks_matchingKeyword_matchesDescriptionsIgnoringCaseInOriginalOrder() {
+        Todo firstMatch = new Todo("Read Book");
+        Deadline secondMatch = new Deadline("return book",
+                LocalDateTime.of(2026, 8, 29, 18, 0));
+        Todo nonMatch = new Todo("buy groceries");
+        TaskList tasks = new TaskList(List.of(firstMatch, secondMatch, nonMatch));
+
+        assertEquals(List.of(firstMatch, secondMatch), tasks.findTasks("BOOK"));
+    }
+
+    @Test
     public void getTasks_modifyReturnedSnapshot_originalListUnchanged() {
         TaskList tasks = new TaskList(List.of(new Todo("read book")));
         List<Task> snapshot = tasks.getTasks();

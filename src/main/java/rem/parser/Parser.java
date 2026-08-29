@@ -3,12 +3,14 @@ package rem.parser;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.Locale;
 
 import rem.command.AddCommand;
 import rem.command.Command;
 import rem.command.CommandType;
 import rem.command.DeleteCommand;
 import rem.command.ExitCommand;
+import rem.command.FindCommand;
 import rem.command.ListCommand;
 import rem.command.MarkCommand;
 import rem.command.OnCommand;
@@ -43,6 +45,7 @@ public class Parser {
         return switch (commandType) {
         case BYE -> new ExitCommand();
         case LIST -> new ListCommand();
+        case FIND -> new FindCommand(parseKeyword(command));
         case ON -> new OnCommand(parseDate(command));
         case MARK -> new MarkCommand(parseTaskNumber(command, "mark"));
         case UNMARK -> new UnmarkCommand(parseTaskNumber(command, "unmark"));
@@ -63,7 +66,7 @@ public class Parser {
             return CommandType.UNKNOWN;
         }
 
-        String commandWord = input.split("\\s+", 2)[0].toUpperCase();
+        String commandWord = input.split("\\s+", 2)[0].toUpperCase(Locale.ROOT);
         try {
             return CommandType.valueOf(commandWord);
         } catch (IllegalArgumentException e) {
@@ -113,6 +116,21 @@ public class Parser {
     }
 
     /**
+     * Reads the keyword supplied to a {@code find} command.
+     *
+     * @param command Full user command.
+     * @return Keyword to search for.
+     * @throws EmptyDescriptionException If no keyword is supplied.
+     */
+    public static String parseKeyword(String command) throws EmptyDescriptionException {
+        String keyword = command.substring(4).trim();
+        if (keyword.isEmpty()) {
+            throw new EmptyDescriptionException();
+        }
+        return keyword;
+    }
+
+    /**
      * Creates the task subtype requested by an add command.
      *
      * @param command Full user command.
@@ -120,7 +138,7 @@ public class Parser {
      * @throws RemException If the task description or date-time arguments are invalid.
      */
     public static Task createTask(String command) throws RemException {
-        String lowerCommand = command.toLowerCase();
+        String lowerCommand = command.toLowerCase(Locale.ROOT);
         if (isCommand(command, "todo")) {
             String description = command.substring(4).trim();
             if (description.isEmpty()) {
@@ -143,7 +161,7 @@ public class Parser {
      * @return True if the input starts with the complete command word.
      */
     private static boolean isCommand(String input, String commandWord) {
-        String lowerInput = input.toLowerCase();
+        String lowerInput = input.toLowerCase(Locale.ROOT);
         return lowerInput.equals(commandWord)
                 || lowerInput.startsWith(commandWord + " ");
     }

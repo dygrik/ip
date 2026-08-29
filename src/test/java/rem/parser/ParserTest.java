@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 
@@ -62,6 +63,31 @@ public class ParserTest {
         assertThrows(InvalidDateException.class, () -> Parser.parseDate("on"));
         assertThrows(InvalidDateException.class, () -> Parser.parseDate("on 2026-08-29 1200"));
         assertThrows(InvalidDateException.class, () -> Parser.parseDate("on tomorrow"));
+    }
+
+    @Test
+    public void commandParsing_turkishDefaultLocale_commandsRemainCaseInsensitive()
+            throws RemException {
+        Locale originalLocale = Locale.getDefault();
+        try {
+            Locale.setDefault(Locale.forLanguageTag("tr-TR"));
+
+            assertEquals(CommandType.FIND, Parser.getCommandType("find book"));
+            assertInstanceOf(Deadline.class,
+                    Parser.createTask("DEADLINE submit report /BY 2026-08-29"));
+        } finally {
+            Locale.setDefault(originalLocale);
+        }
+    }
+
+    @Test
+    public void parseKeyword_validKeyword_keywordReturned() throws EmptyDescriptionException {
+        assertEquals("read book", Parser.parseKeyword("find   read book"));
+    }
+
+    @Test
+    public void parseKeyword_missingKeyword_exceptionThrown() {
+        assertThrows(EmptyDescriptionException.class, () -> Parser.parseKeyword("find"));
     }
 
     @Test

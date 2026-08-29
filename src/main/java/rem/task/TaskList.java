@@ -3,6 +3,7 @@ package rem.task;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import rem.exception.InvalidTaskNumberException;
 
@@ -111,6 +112,23 @@ public class TaskList {
             }
         }
         return scheduledTasks;
+    }
+
+    /**
+     * Finds tasks whose descriptions contain a keyword, ignoring letter case.
+     *
+     * @param keyword Keyword to search for.
+     * @return Matching tasks in their task-list order.
+     */
+    public List<Task> findTasks(String keyword) {
+        String lowerKeyword = keyword.toLowerCase(Locale.ROOT);
+        ArrayList<Task> matchingTasks = new ArrayList<>();
+        for (Task task : tasks) {
+            if (task.getDescription().toLowerCase(Locale.ROOT).contains(lowerKeyword)) {
+                matchingTasks.add(task);
+            }
+        }
+        return matchingTasks;
     }
 
     /**
