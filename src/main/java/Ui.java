@@ -32,7 +32,7 @@ public class Ui implements AutoCloseable {
         System.out.println("Rem: Hello! I'm Rem!");
         System.out.println("Rem: No more sleeping. Need help?");
         if (hasLoadError) {
-            System.out.println("Rem: I couldn't load your saved tasks, so I started with an empty list.");
+            System.out.println("Rem: Rem couldn't find any tasks... That means we get to start a new one!");
         }
         System.out.println(SEPARATOR);
     }

@@ -40,10 +40,10 @@ public class Rem {
                     LocalDate date = parseDate(trimmedCommand);
                     ArrayList<Task> scheduledTasks = findTasksOn(added, date);
                     if (scheduledTasks.isEmpty()) {
-                        ui.showMessage("Nothing is scheduled on " + TaskDateTime.format(date) + ".");
+                        ui.showMessage("You are free on " + TaskDateTime.format(date) + "!");
                         break;
                     }
-                    ui.showMessage("Here's what's scheduled on " + TaskDateTime.format(date) + ":");
+                    ui.showMessage("Here's what's to do on " + TaskDateTime.format(date) + ":");
                     for (int i = 0; i < scheduledTasks.size(); i++) {
                         ui.showMessage((i + 1) + "." + scheduledTasks.get(i));
                     }
@@ -91,7 +91,8 @@ public class Rem {
             } catch (RemException e) {
                 ui.showMessage(e.getMessage());
             } catch (IOException e) {
-                ui.showMessage("I couldn't save your tasks. Please check the data folder.");
+                ui.showMessage("Rem is having trouble saving your tasks... "
+                        + "Something might be wrong with your data folder");
             }
 
             ui.showSeparator();
