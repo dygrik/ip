@@ -41,7 +41,7 @@ public class Rem {
             String command = ui.readCommand();
 
             try {
-                Command parsedCommand = Parser.parse(command, tasks.size());
+                Command parsedCommand = Parser.parse(command);
                 parsedCommand.execute(tasks, ui, storage);
                 isExit = parsedCommand.isExit();
             } catch (RemException e) {

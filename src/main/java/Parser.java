@@ -10,20 +10,19 @@ public class Parser {
      * Converts user input into an executable command.
      *
      * @param input Full user input.
-     * @param taskCount Current number of tasks, used to validate task numbers.
      * @return Command represented by the input.
      * @throws RemException If the command or any of its arguments are invalid.
      */
-    public static Command parse(String input, int taskCount) throws RemException {
+    public static Command parse(String input) throws RemException {
         String command = input.trim();
         CommandType commandType = getCommandType(command);
         return switch (commandType) {
         case BYE -> new ExitCommand();
         case LIST -> new ListCommand();
         case ON -> new OnCommand(parseDate(command));
-        case MARK -> new MarkCommand(parseTaskNumber(command, "mark", taskCount));
-        case UNMARK -> new UnmarkCommand(parseTaskNumber(command, "unmark", taskCount));
-        case DELETE -> new DeleteCommand(parseTaskNumber(command, "delete", taskCount));
+        case MARK -> new MarkCommand(parseTaskNumber(command, "mark"));
+        case UNMARK -> new UnmarkCommand(parseTaskNumber(command, "unmark"));
+        case DELETE -> new DeleteCommand(parseTaskNumber(command, "delete"));
         case TODO, DEADLINE, EVENT -> new AddCommand(createTask(command));
         case UNKNOWN -> throw new UnknownCommandException();
         };
@@ -53,16 +52,15 @@ public class Parser {
      *
      * @param command Full user command.
      * @param commandWord Command word preceding the number.
-     * @param taskCount Current number of tasks.
-     * @return The validated one-based task number.
-     * @throws InvalidTaskNumberException If the argument is not a number for an existing task.
+     * @return The positive one-based task number.
+     * @throws InvalidTaskNumberException If the argument is not a positive number.
      */
-    public static int parseTaskNumber(String command, String commandWord,
-            int taskCount) throws InvalidTaskNumberException {
+    public static int parseTaskNumber(String command, String commandWord)
+            throws InvalidTaskNumberException {
         String numberText = command.substring(commandWord.length()).trim();
         try {
             int taskNumber = Integer.parseInt(numberText);
-            if (taskNumber < 1 || taskNumber > taskCount) {
+            if (taskNumber < 1) {
                 throw new InvalidTaskNumberException();
             }
             return taskNumber;

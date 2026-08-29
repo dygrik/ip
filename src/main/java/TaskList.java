@@ -57,8 +57,10 @@ public class TaskList {
      *
      * @param taskNumber One-based task number.
      * @return The removed task.
+     * @throws InvalidTaskNumberException If the task number does not exist.
      */
-    public Task delete(int taskNumber) {
+    public Task delete(int taskNumber) throws InvalidTaskNumberException {
+        validateTaskNumber(taskNumber);
         return tasks.remove(taskNumber - 1);
     }
 
@@ -67,8 +69,10 @@ public class TaskList {
      *
      * @param taskNumber One-based task number.
      * @return The updated task.
+     * @throws InvalidTaskNumberException If the task number does not exist.
      */
-    public Task mark(int taskNumber) {
+    public Task mark(int taskNumber) throws InvalidTaskNumberException {
+        validateTaskNumber(taskNumber);
         Task task = getTask(taskNumber);
         task.markAsDone();
         return task;
@@ -79,8 +83,10 @@ public class TaskList {
      *
      * @param taskNumber One-based task number.
      * @return The updated task.
+     * @throws InvalidTaskNumberException If the task number does not exist.
      */
-    public Task unmark(int taskNumber) {
+    public Task unmark(int taskNumber) throws InvalidTaskNumberException {
+        validateTaskNumber(taskNumber);
         Task task = getTask(taskNumber);
         task.markAsNotDone();
         return task;
@@ -110,5 +116,11 @@ public class TaskList {
      */
     public List<Task> getTasks() {
         return List.copyOf(tasks);
+    }
+
+    private void validateTaskNumber(int taskNumber) throws InvalidTaskNumberException {
+        if (taskNumber < 1 || taskNumber > tasks.size()) {
+            throw new InvalidTaskNumberException();
+        }
     }
 }

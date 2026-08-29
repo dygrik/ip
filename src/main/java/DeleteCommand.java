@@ -22,9 +22,11 @@ public class DeleteCommand extends Command {
      * @param ui User interface used to display the result.
      * @param storage Storage used to save the updated task list.
      * @throws IOException If the updated task list cannot be saved.
+     * @throws InvalidTaskNumberException If the task number does not exist.
      */
     @Override
-    public void execute(TaskList tasks, Ui ui, Storage storage) throws IOException {
+    public void execute(TaskList tasks, Ui ui, Storage storage)
+            throws IOException, InvalidTaskNumberException {
         Task removedTask = tasks.delete(taskNumber);
         storage.saveTasks(tasks.getTasks());
         ui.showMessage("One less thing to do! Removed:");

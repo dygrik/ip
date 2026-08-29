@@ -11,8 +11,10 @@ public abstract class Command {
      * @param ui User interface used to display command results.
      * @param storage Storage used to save task-list changes.
      * @throws IOException If the command cannot save a task-list change.
+     * @throws RemException If the command cannot be applied to the current task list.
      */
-    public abstract void execute(TaskList tasks, Ui ui, Storage storage) throws IOException;
+    public abstract void execute(TaskList tasks, Ui ui, Storage storage)
+            throws IOException, RemException;
 
     /**
      * Returns whether this command should end the application.
