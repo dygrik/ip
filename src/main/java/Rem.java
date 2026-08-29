@@ -1,11 +1,26 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Rem {
     private static final String SEPARATOR =
             "____________________________________________________________";
+    private static final String LOAD_ERROR_MESSAGE =
+            "Rem: Rem couldn't find any tasks... That means we get to start a new one!";
+    private static final String SAVE_ERROR_MESSAGE =
+            "Rem: Rem is having trouble saving your tasks... "
+                    + "Something might eb wrong with your data folder";
 
     public static void main(String[] args) {
+        ArrayList<Task> added;
+        boolean hasLoadError = false;
+        try {
+            added = Storage.loadTasks();
+        } catch (IOException e) {
+            added = new ArrayList<>();
+            hasLoadError = true;
+        }
+
         String banner = " ____                      \n" //Used Codex to generate ASCII
                 + "|  _ \\    ___    _ __ ___  \n"
                 + "| |_) |  / _ \\  | '_ ` _ \\ \n"
@@ -17,15 +32,15 @@ public class Rem {
         System.out.print(banner);
         System.out.println("Rem: Hello! I'm Rem!");
         System.out.println("Rem: No more sleeping. Need help?");
+        if (hasLoadError) {
+            System.out.println(LOAD_ERROR_MESSAGE);
+        }
         System.out.println(SEPARATOR);
-
-        // Stores tasks in a dynamically sized list so tasks can be added and removed easily.
-        ArrayList<Task> added = new ArrayList<>();
 
         //Scanner picks up and responds to user input
         Scanner scanner = new Scanner(System.in);
         commandLoop:
-        while (true) {
+        while (scanner.hasNextLine()) {
             System.out.print("Me: ");
             String command = scanner.nextLine();
             System.out.println(SEPARATOR);
@@ -48,6 +63,7 @@ public class Rem {
                     int taskNumber = parseTaskNumber(trimmedCommand, "mark", added.size());
                     Task task = added.get(taskNumber - 1);
                     task.markAsDone();
+                    Storage.saveTasks(added);
                     System.out.println("Rem: We did it! I've marked this task as done:");
                     System.out.println("Rem: " + task);
                     break;
@@ -55,12 +71,14 @@ public class Rem {
                     taskNumber = parseTaskNumber(trimmedCommand, "unmark", added.size());
                     task = added.get(taskNumber - 1);
                     task.markAsNotDone();
+                    Storage.saveTasks(added);
                     System.out.println("Rem: Aww ok... I've marked this task as not done yet:");
                     System.out.println("Rem: " + task);
                     break;
                 case DELETE:
                     taskNumber = parseTaskNumber(trimmedCommand, "delete", added.size());
                     Task removedTask = added.remove(taskNumber - 1);
+                    Storage.saveTasks(added);
                     System.out.println("Rem: One less thing to do! Removed:");
                     System.out.println("Rem: " + removedTask);
                     System.out.println("Rem: Now we are only left with " + added.size()
@@ -71,6 +89,7 @@ public class Rem {
                 case EVENT:
                     task = createTask(trimmedCommand);
                     added.add(task);
+                    Storage.saveTasks(added);
                     System.out.println("Rem: Ok! I've added this task:");
                     System.out.println("Rem: " + task);
                     System.out.println("Rem: Now you have " + added.size()
@@ -82,6 +101,8 @@ public class Rem {
                 }
             } catch (RemException e) {
                 System.out.println("Rem: " + e.getMessage());
+            } catch (IOException e) {
+                System.out.println(SAVE_ERROR_MESSAGE);
             }
 
             System.out.println(SEPARATOR);
