@@ -1,6 +1,4 @@
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.List;
 
 public class Rem {
     public static void main(String[] args) {
@@ -33,22 +31,12 @@ public class Rem {
                     }
                     break;
                 case LIST:
-                    ui.showMessage("Hmm... what to do now?");
-                    for (int i = 1; i <= tasks.size(); i++) {
-                        ui.showMessage(i + "." + tasks.getTask(i));
-                    }
+                    Command listCommand = new ListCommand();
+                    listCommand.execute(tasks, ui);
                     break;
                 case ON:
-                    LocalDate date = Parser.parseDate(trimmedCommand);
-                    List<Task> scheduledTasks = tasks.findTasksOn(date);
-                    if (scheduledTasks.isEmpty()) {
-                        ui.showMessage("You are free on " + TaskDateTime.format(date) + "!");
-                        break;
-                    }
-                    ui.showMessage("Here's what's to do on " + TaskDateTime.format(date) + ":");
-                    for (int i = 0; i < scheduledTasks.size(); i++) {
-                        ui.showMessage((i + 1) + "." + scheduledTasks.get(i));
-                    }
+                    Command onCommand = new OnCommand(Parser.parseDate(trimmedCommand));
+                    onCommand.execute(tasks, ui);
                     break;
                 case MARK:
                     int taskNumber = Parser.parseTaskNumber(trimmedCommand, "mark", tasks.size());
