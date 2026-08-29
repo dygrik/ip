@@ -20,6 +20,11 @@ public class Deadline extends Task {
         this.by = by;
     }
 
+    /**
+     * Returns the date and time by which this task is due.
+     *
+     * @return Due date and time.
+     */
     public LocalDateTime getBy() {
         return by;
     }
@@ -34,6 +39,11 @@ public class Deadline extends Task {
         return by.toLocalDate().equals(date);
     }
 
+    /**
+     * Returns this deadline's completion status, description, and due date.
+     *
+     * @return Display representation of this deadline.
+     */
     @Override
     public String toString() {
         return "[D]" + super.toString() + " (by: " + TaskDateTime.format(by) + ")";
