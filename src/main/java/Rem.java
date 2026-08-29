@@ -25,9 +25,13 @@ public class Rem {
                 CommandType commandType = Parser.getCommandType(trimmedCommand);
                 switch (commandType) {
                 case BYE:
-                    ui.showMessage("[Yawn] Need more sleep. Time for bed...");
+                    Command exitCommand = new ExitCommand();
+                    exitCommand.execute(tasks, ui);
                     ui.showSeparator();
-                    break commandLoop;
+                    if (exitCommand.isExit()) {
+                        break commandLoop;
+                    }
+                    break;
                 case LIST:
                     ui.showMessage("Hmm... what to do now?");
                     for (int i = 1; i <= tasks.size(); i++) {
