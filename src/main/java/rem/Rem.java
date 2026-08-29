@@ -56,7 +56,7 @@ public class Rem {
             } catch (RemException e) {
                 ui.showMessage(e.getMessage());
             } catch (IOException e) {
-                ui.showMessage("I couldn't save your tasks. Please check the data folder.");
+                ui.showMessage("Rem couldn't save the tasks... Could you check the data folder?");
             } finally {
                 ui.showSeparator();
             }

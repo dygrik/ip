@@ -34,9 +34,12 @@ public class AddCommand extends Command {
     public void execute(TaskList tasks, Ui ui, Storage storage) throws IOException {
         tasks.add(task);
         storage.saveTasks(tasks.getTasks());
-        ui.showMessage("Ok! I've added this task:");
+        ui.showMessage("Ok! I've added this:");
         ui.showMessage(task.toString());
-        ui.showMessage("Now you have " + tasks.size()
-                + (tasks.size() == 1 ? " task" : " tasks") + " in the list.");
+        if (tasks.size() == 1) {
+            ui.showMessage("Yay! Our first task!");
+        } else {
+            ui.showMessage("Now you have " + tasks.size() + " tasks in the list.");
+        }
     }
 }

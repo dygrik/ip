@@ -35,7 +35,7 @@ public class OnCommand extends Command {
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         List<Task> scheduledTasks = tasks.findTasksOn(date);
         if (scheduledTasks.isEmpty()) {
-            ui.showMessage("Nothing is scheduled on " + TaskDateTime.format(date) + ".");
+            ui.showMessage("You're free on " + TaskDateTime.format(date) + ".");
             return;
         }
 
