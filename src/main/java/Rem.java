@@ -40,17 +40,13 @@ public class Rem {
                     break;
                 case MARK:
                     int taskNumber = Parser.parseTaskNumber(trimmedCommand, "mark", tasks.size());
-                    Task task = tasks.mark(taskNumber);
-                    Storage.saveTasks(tasks.getTasks());
-                    ui.showMessage("We did it! I've marked this task as done:");
-                    ui.showMessage(task.toString());
+                    Command markCommand = new MarkCommand(taskNumber);
+                    markCommand.execute(tasks, ui);
                     break;
                 case UNMARK:
                     taskNumber = Parser.parseTaskNumber(trimmedCommand, "unmark", tasks.size());
-                    task = tasks.unmark(taskNumber);
-                    Storage.saveTasks(tasks.getTasks());
-                    ui.showMessage("Aww ok... I've marked this task as not done yet:");
-                    ui.showMessage(task.toString());
+                    Command unmarkCommand = new UnmarkCommand(taskNumber);
+                    unmarkCommand.execute(tasks, ui);
                     break;
                 case DELETE:
                     taskNumber = Parser.parseTaskNumber(trimmedCommand, "delete", tasks.size());
@@ -64,7 +60,7 @@ public class Rem {
                 case TODO:
                 case DEADLINE:
                 case EVENT:
-                    task = Parser.createTask(trimmedCommand);
+                    Task task = Parser.createTask(trimmedCommand);
                     tasks.add(task);
                     Storage.saveTasks(tasks.getTasks());
                     ui.showMessage("Ok! I've added this task:");
