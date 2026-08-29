@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -70,6 +71,16 @@ public final class TaskDateTime {
             return dateTime.format(DISPLAY_DATE);
         }
         return dateTime.format(DISPLAY_DATE_TIME);
+    }
+
+    /**
+     * Formats a date for display.
+     *
+     * @param date Date to format.
+     * @return A readable English date.
+     */
+    public static String format(LocalDate date) {
+        return date.format(DISPLAY_DATE);
     }
 
     /**

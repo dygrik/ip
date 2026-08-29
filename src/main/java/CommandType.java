@@ -2,6 +2,7 @@
 public enum CommandType {
     BYE,
     LIST,
+    ON,
     MARK,
     UNMARK,
     DELETE,

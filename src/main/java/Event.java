@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -18,6 +19,16 @@ public class Event extends Task {
         super(description);
         this.from = from;
         this.to = to;
+    }
+
+    /**
+     * Checks whether this event overlaps a given date.
+     *
+     * @param date Date to check.
+     * @return True if the event occurs at any time on that date.
+     */
+    public boolean occursOn(LocalDate date) {
+        return !date.isBefore(from.toLocalDate()) && !date.isAfter(to.toLocalDate());
     }
 
     @Override
