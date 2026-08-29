@@ -23,10 +23,20 @@ public class Event extends Task {
         this.to = to;
     }
 
+    /**
+     * Returns the date and time at which this event starts.
+     *
+     * @return Start date and time.
+     */
     public LocalDateTime getFrom() {
         return from;
     }
 
+    /**
+     * Returns the date and time at which this event ends.
+     *
+     * @return End date and time.
+     */
     public LocalDateTime getTo() {
         return to;
     }
@@ -41,6 +51,11 @@ public class Event extends Task {
         return !date.isBefore(from.toLocalDate()) && !date.isAfter(to.toLocalDate());
     }
 
+    /**
+     * Returns this event's completion status, description, and time range.
+     *
+     * @return Display representation of this event.
+     */
     @Override
     public String toString() {
         return "[E]" + super.toString() + " (from: " + TaskDateTime.format(from)

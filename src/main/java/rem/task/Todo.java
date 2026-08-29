@@ -1,12 +1,23 @@
 package rem.task;
 
-//A task without a date/ time
+/**
+ * Represents a task without an associated date or time.
+ */
 public class Todo extends Task {
-    //Creates a to-do
+    /**
+     * Creates an incomplete to-do task.
+     *
+     * @param description Description of the task.
+     */
     public Todo(String description) {
         super(description);
     }
 
+    /**
+     * Returns this to-do's type, completion status, and description.
+     *
+     * @return Display representation of this to-do.
+     */
     @Override
     public String toString() {
         return "[T]" + super.toString();

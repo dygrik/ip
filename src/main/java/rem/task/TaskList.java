@@ -122,6 +122,12 @@ public class TaskList {
         return List.copyOf(tasks);
     }
 
+    /**
+     * Checks that a one-based task number identifies a stored task.
+     *
+     * @param taskNumber One-based task number to validate.
+     * @throws InvalidTaskNumberException If the task number does not exist.
+     */
     private void validateTaskNumber(int taskNumber) throws InvalidTaskNumberException {
         if (taskNumber < 1 || taskNumber > tasks.size()) {
             throw new InvalidTaskNumberException();

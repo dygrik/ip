@@ -135,12 +135,27 @@ public class Parser {
         return createEvent(command, lowerCommand);
     }
 
+    /**
+     * Checks whether the input consists of a given command word, optionally followed by arguments.
+     *
+     * @param input User input to inspect.
+     * @param commandWord Command word to match.
+     * @return True if the input starts with the complete command word.
+     */
     private static boolean isCommand(String input, String commandWord) {
         String lowerInput = input.toLowerCase();
         return lowerInput.equals(commandWord)
                 || lowerInput.startsWith(commandWord + " ");
     }
 
+    /**
+     * Creates a deadline from its description and due-date arguments.
+     *
+     * @param command Original user command, preserving the description's capitalization.
+     * @param lowerCommand Lowercase form of the command used to locate keywords.
+     * @return Deadline described by the command.
+     * @throws RemException If the description or due-date arguments are invalid.
+     */
     private static Deadline createDeadline(String command, String lowerCommand) throws RemException {
         String details = command.substring(8).trim();
         if (details.isEmpty()) {
@@ -168,6 +183,14 @@ public class Parser {
         }
     }
 
+    /**
+     * Creates an event from its description, start, and end arguments.
+     *
+     * @param command Original user command, preserving the description's capitalization.
+     * @param lowerCommand Lowercase form of the command used to locate keywords.
+     * @return Event described by the command.
+     * @throws RemException If the description or date-time arguments are invalid.
+     */
     private static Event createEvent(String command, String lowerCommand) throws RemException {
         String details = command.substring(5).trim();
         if (details.isEmpty()) {

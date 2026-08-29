@@ -76,6 +76,12 @@ public class Storage {
         Files.write(dataFile, taskLines);
     }
 
+    /**
+     * Converts a task into one line of Rem's storage format.
+     *
+     * @param task Task to serialize.
+     * @return Machine-readable representation of the task.
+     */
     private static String toDataLine(Task task) {
         String status = task.isDone() ? "1" : "0";
         if (task instanceof Deadline deadline) {
@@ -90,6 +96,14 @@ public class Storage {
         return "T | " + status + " | " + task.getDescription();
     }
 
+    /**
+     * Reconstructs a task from the fields in one storage line.
+     *
+     * @param taskParts Fields from the storage line.
+     * @param lineNumber One-based line number used in error messages.
+     * @return Task represented by the fields.
+     * @throws IOException If the fields do not represent a valid task.
+     */
     private static Task createTask(String[] taskParts, int lineNumber) throws IOException {
         if (taskParts.length < 2 || (!taskParts[1].equals("0") && !taskParts[1].equals("1"))) {
             throw invalidDataLine(lineNumber);
@@ -121,6 +135,14 @@ public class Storage {
         };
     }
 
+    /**
+     * Checks that a storage line has the required number of non-empty fields.
+     *
+     * @param taskParts Fields from the storage line.
+     * @param expectedCount Required number of fields.
+     * @param lineNumber One-based line number used in error messages.
+     * @throws IOException If a field is missing or empty.
+     */
     private static void validateParts(String[] taskParts, int expectedCount,
             int lineNumber) throws IOException {
         if (taskParts.length != expectedCount) {
@@ -133,6 +155,12 @@ public class Storage {
         }
     }
 
+    /**
+     * Creates a consistent exception for a malformed storage line.
+     *
+     * @param lineNumber One-based number of the malformed line.
+     * @return Exception describing where invalid data was found.
+     */
     private static IOException invalidDataLine(int lineNumber) {
         return new IOException("Invalid task data on line " + lineNumber + ".");
     }
