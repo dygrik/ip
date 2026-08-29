@@ -46,8 +46,11 @@ public class Rem {
         ui.showWelcome(hasLoadError);
 
         boolean isExit = false;
-        while (ui.hasNextCommand() && !isExit) {
+        while (!isExit) {
             String command = ui.readCommand();
+            if (command == null) {
+                break;
+            }
 
             try {
                 Command parsedCommand = Parser.parse(command);

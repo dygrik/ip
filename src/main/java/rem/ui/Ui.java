@@ -43,21 +43,16 @@ public class Ui implements AutoCloseable {
     }
 
     /**
-     * Returns whether another command is available to read.
-     *
-     * @return True if another input line is available.
-     */
-    public boolean hasNextCommand() {
-        return scanner.hasNextLine();
-    }
-
-    /**
      * Prompts for and reads the next command.
      *
-     * @return The command entered by the user.
+     * @return The command entered by the user, or {@code null} if the input stream is closed.
      */
     public String readCommand() {
         System.out.print("Me: ");
+        System.out.flush();
+        if (!scanner.hasNextLine()) {
+            return null;
+        }
         String command = scanner.nextLine();
         System.out.println(SEPARATOR);
         return command;
