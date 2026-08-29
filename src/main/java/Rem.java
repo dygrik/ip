@@ -3,17 +3,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class Rem {
-    private static final String SEPARATOR =
-            "____________________________________________________________";
-    private static final String LOAD_ERROR_MESSAGE =
-            "Rem: Rem couldn't find any tasks... That means we get to start a new one!";
-    private static final String SAVE_ERROR_MESSAGE =
-            "Rem: Rem is having trouble saving your tasks... "
-                    + "Something might eb wrong with your data folder";
-
     public static void main(String[] args) {
         ArrayList<Task> added;
         boolean hasLoadError = false;
@@ -24,56 +15,37 @@ public class Rem {
             hasLoadError = true;
         }
 
-        String banner = " ____                      \n" //Used Codex to generate ASCII
-                + "|  _ \\    ___    _ __ ___  \n"
-                + "| |_) |  / _ \\  | '_ ` _ \\ \n"
-                + "|  _ <  |  __/  | | | | | |\n"
-                + "|_| \\_\\  \\___|  |_| |_| |_|\n";
+        Ui ui = new Ui();
+        ui.showWelcome(hasLoadError);
 
-        // Greets the user
-        System.out.println(SEPARATOR);
-        System.out.print(banner);
-        System.out.println("Rem: Hello! I'm Rem!");
-        System.out.println("Rem: No more sleeping. Need help?");
-        if (hasLoadError) {
-            System.out.println(LOAD_ERROR_MESSAGE);
-        }
-        System.out.println(SEPARATOR);
-
-        //Scanner picks up and responds to user input
-        Scanner scanner = new Scanner(System.in);
         commandLoop:
-        while (scanner.hasNextLine()) {
-            System.out.print("Me: ");
-            String command = scanner.nextLine();
-            System.out.println(SEPARATOR);
+        while (ui.hasNextCommand()) {
+            String command = ui.readCommand();
             String trimmedCommand = command.trim();
 
             try {
                 CommandType commandType = getCommandType(trimmedCommand);
                 switch (commandType) {
                 case BYE:
-                    System.out.println("Rem: [Yawn] Need more sleep. Time for bed...");
-                    System.out.println(SEPARATOR);
+                    ui.showMessage("[Yawn] Need more sleep. Time for bed...");
+                    ui.showSeparator();
                     break commandLoop;
                 case LIST:
-                    System.out.println("Rem: Hmm... what to do now?");
+                    ui.showMessage("Hmm... what to do now?");
                     for (int i = 0; i < added.size(); i++) {
-                        System.out.println("Rem: " + (i + 1) + "." + added.get(i));
+                        ui.showMessage((i + 1) + "." + added.get(i));
                     }
                     break;
                 case ON:
                     LocalDate date = parseDate(trimmedCommand);
                     ArrayList<Task> scheduledTasks = findTasksOn(added, date);
                     if (scheduledTasks.isEmpty()) {
-                        System.out.println("Rem: Nothing is scheduled on "
-                                + TaskDateTime.format(date) + ".");
+                        ui.showMessage("Nothing is scheduled on " + TaskDateTime.format(date) + ".");
                         break;
                     }
-                    System.out.println("Rem: Here's what's scheduled on "
-                            + TaskDateTime.format(date) + ":");
+                    ui.showMessage("Here's what's scheduled on " + TaskDateTime.format(date) + ":");
                     for (int i = 0; i < scheduledTasks.size(); i++) {
-                        System.out.println("Rem: " + (i + 1) + "." + scheduledTasks.get(i));
+                        ui.showMessage((i + 1) + "." + scheduledTasks.get(i));
                     }
                     break;
                 case MARK:
@@ -81,24 +53,24 @@ public class Rem {
                     Task task = added.get(taskNumber - 1);
                     task.markAsDone();
                     Storage.saveTasks(added);
-                    System.out.println("Rem: We did it! I've marked this task as done:");
-                    System.out.println("Rem: " + task);
+                    ui.showMessage("We did it! I've marked this task as done:");
+                    ui.showMessage(task.toString());
                     break;
                 case UNMARK:
                     taskNumber = parseTaskNumber(trimmedCommand, "unmark", added.size());
                     task = added.get(taskNumber - 1);
                     task.markAsNotDone();
                     Storage.saveTasks(added);
-                    System.out.println("Rem: Aww ok... I've marked this task as not done yet:");
-                    System.out.println("Rem: " + task);
+                    ui.showMessage("Aww ok... I've marked this task as not done yet:");
+                    ui.showMessage(task.toString());
                     break;
                 case DELETE:
                     taskNumber = parseTaskNumber(trimmedCommand, "delete", added.size());
                     Task removedTask = added.remove(taskNumber - 1);
                     Storage.saveTasks(added);
-                    System.out.println("Rem: One less thing to do! Removed:");
-                    System.out.println("Rem: " + removedTask);
-                    System.out.println("Rem: Now we are only left with " + added.size()
+                    ui.showMessage("One less thing to do! Removed:");
+                    ui.showMessage(removedTask.toString());
+                    ui.showMessage("Now we are only left with " + added.size()
                             + (added.size() == 1 ? " task" : " tasks") + " in the list.");
                     break;
                 case TODO:
@@ -107,9 +79,9 @@ public class Rem {
                     task = createTask(trimmedCommand);
                     added.add(task);
                     Storage.saveTasks(added);
-                    System.out.println("Rem: Ok! I've added this task:");
-                    System.out.println("Rem: " + task);
-                    System.out.println("Rem: Now you have " + added.size()
+                    ui.showMessage("Ok! I've added this task:");
+                    ui.showMessage(task.toString());
+                    ui.showMessage("Now you have " + added.size()
                             + (added.size() == 1 ? " task" : " tasks") + " in the list.");
                     break;
                 case UNKNOWN:
@@ -117,15 +89,15 @@ public class Rem {
                     throw new UnknownCommandException();
                 }
             } catch (RemException e) {
-                System.out.println("Rem: " + e.getMessage());
+                ui.showMessage(e.getMessage());
             } catch (IOException e) {
-                System.out.println(SAVE_ERROR_MESSAGE);
+                ui.showMessage("I couldn't save your tasks. Please check the data folder.");
             }
 
-            System.out.println(SEPARATOR);
+            ui.showSeparator();
         }
 
-        scanner.close();
+        ui.close();
     }
 
     //Identifies the appropriate CommandType from the first word of the user's input
