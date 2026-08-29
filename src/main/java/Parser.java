@@ -7,6 +7,29 @@ import java.time.format.DateTimeParseException;
  */
 public class Parser {
     /**
+     * Converts user input into an executable command.
+     *
+     * @param input Full user input.
+     * @param taskCount Current number of tasks, used to validate task numbers.
+     * @return Command represented by the input.
+     * @throws RemException If the command or any of its arguments are invalid.
+     */
+    public static Command parse(String input, int taskCount) throws RemException {
+        String command = input.trim();
+        CommandType commandType = getCommandType(command);
+        return switch (commandType) {
+        case BYE -> new ExitCommand();
+        case LIST -> new ListCommand();
+        case ON -> new OnCommand(parseDate(command));
+        case MARK -> new MarkCommand(parseTaskNumber(command, "mark", taskCount));
+        case UNMARK -> new UnmarkCommand(parseTaskNumber(command, "unmark", taskCount));
+        case DELETE -> new DeleteCommand(parseTaskNumber(command, "delete", taskCount));
+        case TODO, DEADLINE, EVENT -> new AddCommand(createTask(command));
+        case UNKNOWN -> throw new UnknownCommandException();
+        };
+    }
+
+    /**
      * Identifies the command type from the first word of the input.
      *
      * @param input Trimmed user input.
