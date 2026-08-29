@@ -1,8 +1,14 @@
 package rem.task;
 
-//A task without a date/ time
+/**
+ * Represents a task without a scheduled date or time.
+ */
 public class Todo extends Task {
-    //Creates a to-do
+    /**
+     * Creates a to-do task with the specified description.
+     *
+     * @param description Description of the task.
+     */
     public Todo(String description) {
         super(description);
     }
