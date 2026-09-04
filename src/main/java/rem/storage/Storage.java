@@ -110,28 +110,28 @@ public class Storage {
         }
 
         return switch (taskParts[0]) {
-        case "T" -> {
-            validateParts(taskParts, 3, lineNumber);
-            yield new Todo(taskParts[2]);
-        }
-        case "D" -> {
-            validateParts(taskParts, 4, lineNumber);
-            try {
-                yield new Deadline(taskParts[2], TaskDateTime.parse(taskParts[3]));
-            } catch (DateTimeParseException e) {
-                throw invalidDataLine(lineNumber);
+            case "T" -> {
+                validateParts(taskParts, 3, lineNumber);
+                yield new Todo(taskParts[2]);
             }
-        }
-        case "E" -> {
-            validateParts(taskParts, 5, lineNumber);
-            try {
-                yield new Event(taskParts[2], TaskDateTime.parse(taskParts[3]),
-                        TaskDateTime.parse(taskParts[4]));
-            } catch (DateTimeParseException e) {
-                throw invalidDataLine(lineNumber);
+            case "D" -> {
+                validateParts(taskParts, 4, lineNumber);
+                try {
+                    yield new Deadline(taskParts[2], TaskDateTime.parse(taskParts[3]));
+                } catch (DateTimeParseException e) {
+                    throw invalidDataLine(lineNumber);
+                }
             }
-        }
-        default -> throw invalidDataLine(lineNumber);
+            case "E" -> {
+                validateParts(taskParts, 5, lineNumber);
+                try {
+                    yield new Event(taskParts[2], TaskDateTime.parse(taskParts[3]),
+                            TaskDateTime.parse(taskParts[4]));
+                } catch (DateTimeParseException e) {
+                    throw invalidDataLine(lineNumber);
+                }
+            }
+            default -> throw invalidDataLine(lineNumber);
         };
     }
 

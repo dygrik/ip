@@ -2,9 +2,6 @@ package rem.ui;
 
 import java.util.Scanner;
 
-import rem.task.Task;
-import rem.task.TaskList;
-
 /**
  * Handles console input and output for Rem.
  */

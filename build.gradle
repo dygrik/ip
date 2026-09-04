@@ -1,7 +1,13 @@
 plugins {
+    id 'checkstyle'
     id 'java'
     id 'application'
     id 'com.gradleup.shadow' version '9.5.1'
+}
+
+checkstyle {
+    toolVersion = '11.0.0'
+    maxWarnings = 0
 }
 
 java {

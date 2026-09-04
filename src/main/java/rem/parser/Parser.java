@@ -43,15 +43,15 @@ public class Parser {
         String command = input.trim();
         CommandType commandType = getCommandType(command);
         return switch (commandType) {
-        case BYE -> new ExitCommand();
-        case LIST -> new ListCommand();
-        case FIND -> new FindCommand(parseKeyword(command));
-        case ON -> new OnCommand(parseDate(command));
-        case MARK -> new MarkCommand(parseTaskNumber(command, "mark"));
-        case UNMARK -> new UnmarkCommand(parseTaskNumber(command, "unmark"));
-        case DELETE -> new DeleteCommand(parseTaskNumber(command, "delete"));
-        case TODO, DEADLINE, EVENT -> new AddCommand(createTask(command));
-        case UNKNOWN -> throw new UnknownCommandException();
+            case BYE -> new ExitCommand();
+            case LIST -> new ListCommand();
+            case FIND -> new FindCommand(parseKeyword(command));
+            case ON -> new OnCommand(parseDate(command));
+            case MARK -> new MarkCommand(parseTaskNumber(command, "mark"));
+            case UNMARK -> new UnmarkCommand(parseTaskNumber(command, "unmark"));
+            case DELETE -> new DeleteCommand(parseTaskNumber(command, "delete"));
+            case TODO, DEADLINE, EVENT -> new AddCommand(createTask(command));
+            case UNKNOWN -> throw new UnknownCommandException();
         };
     }
 
