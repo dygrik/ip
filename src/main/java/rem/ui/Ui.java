@@ -1,6 +1,7 @@
 package rem.ui;
 
 import java.util.Scanner;
+import java.util.function.Consumer;
 
 /**
  * Handles console input and output for Rem.
@@ -15,12 +16,24 @@ public class Ui implements AutoCloseable {
             + "|_| \\_\\  \\___|  |_| |_| |_|\n";
 
     private final Scanner scanner;
+    private final Consumer<String> output;
 
     /**
      * Creates a UI that reads from standard input.
      */
     public Ui() {
         scanner = new Scanner(System.in);
+        output = message -> System.out.println("Rem: " + message);
+    }
+
+    /**
+     * Creates a message-only UI for a graphical conversation.
+     *
+     * @param output Consumer receiving each response line.
+     */
+    public Ui(Consumer<String> output) {
+        scanner = null;
+        this.output = output;
     }
 
     /**
@@ -61,7 +74,7 @@ public class Ui implements AutoCloseable {
      * @param message Message to display.
      */
     public void showMessage(String message) {
-        System.out.println("Rem: " + message);
+        output.accept(message);
     }
 
     /**
@@ -76,6 +89,8 @@ public class Ui implements AutoCloseable {
      */
     @Override
     public void close() {
-        scanner.close();
+        if (scanner != null) {
+            scanner.close();
+        }
     }
 }

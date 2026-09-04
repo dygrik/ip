@@ -1,0 +1,39 @@
+.root {
+    -fx-background-color: black;
+    -fx-font-family: "Segoe UI";
+    -fx-font-size: 14px;
+}
+.header { -fx-padding: 24 24 18 24; }
+.title { -fx-text-fill: white; -fx-font-size: 26px; -fx-font-weight: bold; }
+.subtitle { -fx-text-fill: #a7abb8; -fx-font-size: 12px; }
+.conversation { -fx-padding: 16 20 24 20; -fx-background-color: black; }
+.scroll-pane, .scroll-pane > .viewport { -fx-background-color: black; }
+.scroll-pane { -fx-padding: 0; -fx-background-insets: 0; }
+.message {
+    -fx-background-color: #202331;
+    -fx-background-radius: 16;
+    -fx-padding: 13 16;
+    -fx-text-fill: #f2f3fa;
+}
+.user-message { -fx-background-color: #35304b; }
+.composer { -fx-padding: 16 20 20 20; }
+.text-field {
+    -fx-background-color: #17181e;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #9699a8;
+    -fx-background-radius: 12;
+    -fx-padding: 12;
+}
+.text-field:focused { -fx-border-color: #a5a3df; -fx-border-radius: 12; }
+.button {
+    -fx-background-color: #b7b5f0;
+    -fx-text-fill: #151420;
+    -fx-background-radius: 12;
+    -fx-padding: 12 18;
+    -fx-cursor: hand;
+}
+.button:hover { -fx-background-color: #d0ceff; }
+.button:pressed { -fx-background-color: #9692d8; }
+.scroll-bar:vertical { -fx-background-color: black; }
+.scroll-bar .thumb { -fx-background-color: #444451; -fx-background-radius: 8; }
+.scroll-bar .increment-button, .scroll-bar .decrement-button { -fx-background-color: black; }

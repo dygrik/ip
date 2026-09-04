@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<fx:root type="HBox" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+         alignment="TOP_LEFT" spacing="12">
+    <StackPane fx:id="avatar" minWidth="48" maxWidth="48" minHeight="48" maxHeight="48"/>
+    <Label fx:id="dialog" wrapText="true" minWidth="0" styleClass="message"/>
+</fx:root>
