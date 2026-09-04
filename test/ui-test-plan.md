@@ -5,7 +5,8 @@ This file is the source of truth for scripted end-to-end tests of Rem's console 
 ## Launch information
 
 - Required JDK: Java 25
-- Compile: `javac -d out` followed by every `.java` file under `src/main/java`
+- Compile: `javac -d out` followed by every `.java` file under `src/main/java` except the JavaFX-only classes
+  `Launcher.java`, `Main.java`, `MainWindow.java`, and `DialogBox.java`
 - Run: `java -cp out rem.Rem`
 - Comparison: exact standard-output comparison, with CRLF and LF treated as equivalent
 - Default timeout: 10 seconds per test case
@@ -646,3 +647,19 @@ Me: ____________________________________________________________
 Rem: [Yawn] Need more sleep. Time for bed...
 ____________________________________________________________
 ```
+
+## Graphical interface regression checks
+
+Run `gradlew test` on a desktop with Java 25. `MainWindowTest` loads the actual FXML and CSS
+on the JavaFX thread, submits commands through Send and Enter, and checks bubble order,
+avatars, wrapping, resizing, scrolling, and exit controls. The console cases above remain
+unchanged because both interfaces execute the same commands.
+
+Launch the GUI with `gradlew run` or `java -jar build/libs/rem.jar` after `gradlew shadowJar`.
+The chat background uses `images/rem_background.png`, centered and scaled to cover the window.
+Verify that it stays fixed while scrolling and fills the window when resized. Message bubbles
+remain opaque, with dark translucent header and input areas for readable text.
+Rem uses `images/rem.jpeg`, and the user's avatar uses `images/hidden_king.jpg`,
+center-cropped into a circle without stretching. The header subtitle reads
+`A little help, then back to sleep...`.
+`bye` displays the farewell, disables input, and closes the application after 1.5 seconds.

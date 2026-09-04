@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="rem.ui.MainWindow" prefWidth="560" prefHeight="720"
+            stylesheets="@../css/main.css">
+    <top>
+        <VBox styleClass="header" spacing="5">
+            <Label text="RemBot" styleClass="title"/>
+            <Label text="A little help, then back to sleep..." styleClass="subtitle"/>
+        </VBox>
+    </top>
+    <center>
+        <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER">
+            <content><VBox fx:id="dialogContainer" spacing="18" styleClass="conversation"/></content>
+        </ScrollPane>
+    </center>
+    <bottom>
+        <VBox spacing="8" styleClass="composer">
+            <Label text="Try: todo read book · list · find book · bye" styleClass="subtitle"/>
+            <HBox spacing="10">
+                <TextField fx:id="userInput" promptText="Tell Rem what to do…"
+                           HBox.hgrow="ALWAYS" onAction="#handleUserInput"/>
+                <Button fx:id="sendButton" text="Send" onAction="#handleUserInput"/>
+            </HBox>
+        </VBox>
+    </bottom>
+</BorderPane>

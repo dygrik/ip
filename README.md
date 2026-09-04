@@ -2,6 +2,23 @@
 
 This is a greenfield Java project for the chatbot Rem. Given below are instructions on how to use it.
 
+## Running RemBot
+
+Use Java 25 and run `.\gradlew.bat run` to open the JavaFX chat window.
+Send a command with Enter or the Send button. Tasks are saved in `data/rem.txt`
+relative to the directory where you launch Rem. Existing console commands also work
+in the GUI, including `todo`, `deadline`, `event`, `list`, `mark`, `unmark`,
+`delete`, `find`, `on`, and `bye`. The farewell stays visible briefly before closing.
+
+Build the runnable JAR with `.\gradlew.bat shadowJar`, then run
+`java -jar build/libs/rem.jar`. The bundled JavaFX natives target Windows, macOS,
+and Linux x64, matching the tutorial setup. Other architectures need matching JavaFX natives.
+For the console interface, use `.\gradlew.bat runConsole` or run `rem.Rem` in the IDE.
+For the GUI in IntelliJ, run `rem.Launcher` after refreshing Gradle.
+
+FXML layouts are in `src/main/resources/view` and styling is in
+`src/main/resources/css/main.css`. The supplied Rem picture is bundled as a resource.
+
 ## Checking code style
 
 Use JDK 25 and run these commands from the project directory:

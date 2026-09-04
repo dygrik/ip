@@ -52,20 +52,55 @@ public class Rem {
                 break;
             }
 
-            try {
-                Command parsedCommand = Parser.parse(command);
-                parsedCommand.execute(tasks, ui, storage);
-                isExit = parsedCommand.isExit();
-            } catch (RemException e) {
-                ui.showMessage(e.getMessage());
-            } catch (IOException e) {
-                ui.showMessage("Rem couldn't save the tasks... Could you check the data folder?");
-            } finally {
-                ui.showSeparator();
-            }
+            isExit = execute(command, ui);
+            ui.showSeparator();
         }
 
         ui.close();
+    }
+
+    /**
+     * Returns the greeting and any warning about loading saved tasks.
+     *
+     * @return Initial graphical conversation message.
+     */
+    public String getWelcome() {
+        return "Hello! I'm Rem!\nNo more sleeping. Need help?"
+                + (hasLoadError ? "\nRem found nothing... Guess I'll start a new one!" : "");
+    }
+
+    /**
+     * Processes one graphical input using the same commands as the console.
+     *
+     * @param input User command.
+     * @return Collected response and whether the conversation should end.
+     */
+    public Response getResponse(String input) {
+        StringBuilder messages = new StringBuilder();
+        Ui responseUi = new Ui(message -> {
+            if (!messages.isEmpty()) {
+                messages.append('\n');
+            }
+            messages.append(message);
+        });
+        boolean isExit = execute(input, responseUi);
+        return new Response(messages.toString(), isExit);
+    }
+
+    /**
+     * Executes a command and translates validation or storage errors into messages.
+     */
+    private boolean execute(String input, Ui targetUi) {
+        try {
+            Command command = Parser.parse(input);
+            command.execute(tasks, targetUi, storage);
+            return command.isExit();
+        } catch (RemException e) {
+            targetUi.showMessage(e.getMessage());
+        } catch (IOException e) {
+            targetUi.showMessage("Rem couldn't save the tasks... Could you check the data folder?");
+        }
+        return false;
     }
 
     /**
