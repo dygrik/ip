@@ -2,6 +2,31 @@
 
 This is a greenfield Java project for the chatbot Rem. Given below are instructions on how to use it.
 
+## Checking code style
+
+Use JDK 25 and run these commands from the project directory:
+
+```powershell
+.\gradlew.bat checkstyleMain checkstyleTest
+.\gradlew.bat check
+```
+
+The first command checks production and test Java code. The second runs both Checkstyle
+and the JUnit tests. On macOS/Linux, use `./gradlew` instead of `.\gradlew.bat`.
+Errors and warnings fail the checks. HTML reports are written to
+`build/reports/checkstyle/main.html` and `build/reports/checkstyle/test.html`.
+
+Checkstyle 11.0.0 uses the SE-EDU rules in `config/checkstyle/checkstyle.xml`, copied from
+[AddressBook Level 3](https://github.com/se-edu/addressbook-level3/tree/master/config/checkstyle)
+as directed by the [SE-EDU tutorial](https://se-education.org/guides/tutorials/checkstyle.html).
+`suppressions.xml` retains the tutorial's test-code Javadoc exceptions; production code
+is not exempted. Checkstyle complements the coding-standard skill and manual review;
+it does not verify every judgment-based rule or application correctness.
+
+For optional IntelliJ integration, install CheckStyle-IDEA, select version 11.0.0,
+import `config/checkstyle/checkstyle.xml` as a local configuration, and enable scanning
+of Java sources including tests. Gradle remains the shared, reproducible check.
+
 ## Setting up in Intellij
 
 Prerequisites: JDK 25, update Intellij to the most recent version.

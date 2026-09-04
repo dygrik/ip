@@ -45,12 +45,12 @@ public class ParserTest {
     @Test
     public void parseTaskNumber_missingNonNumericOrNonPositiveNumber_exceptionThrown() {
         assertThrows(InvalidTaskNumberException.class, () -> Parser.parseTaskNumber("mark", "mark"));
-        assertThrows(InvalidTaskNumberException.class,
-                () -> Parser.parseTaskNumber("mark two", "mark"));
-        assertThrows(InvalidTaskNumberException.class,
-                () -> Parser.parseTaskNumber("mark 0", "mark"));
-        assertThrows(InvalidTaskNumberException.class,
-                () -> Parser.parseTaskNumber("mark -1", "mark"));
+        assertThrows(InvalidTaskNumberException.class, () ->
+                Parser.parseTaskNumber("mark two", "mark"));
+        assertThrows(InvalidTaskNumberException.class, () ->
+                Parser.parseTaskNumber("mark 0", "mark"));
+        assertThrows(InvalidTaskNumberException.class, () ->
+                Parser.parseTaskNumber("mark -1", "mark"));
     }
 
     @Test
@@ -120,27 +120,27 @@ public class ParserTest {
     @Test
     public void createTask_emptyDescriptions_exceptionThrown() {
         assertThrows(EmptyDescriptionException.class, () -> Parser.createTask("todo"));
-        assertThrows(EmptyDescriptionException.class,
-                () -> Parser.createTask("deadline /by 2026-08-29"));
-        assertThrows(EmptyDescriptionException.class,
-                () -> Parser.createTask("event /from 2026-08-29 /to 2026-08-30"));
+        assertThrows(EmptyDescriptionException.class, () ->
+                Parser.createTask("deadline /by 2026-08-29"));
+        assertThrows(EmptyDescriptionException.class, () ->
+                Parser.createTask("event /from 2026-08-29 /to 2026-08-30"));
     }
 
     @Test
     public void createTask_invalidDeadlineDetails_exceptionThrown() {
-        assertThrows(InvalidDeadlineFormatException.class,
-                () -> Parser.createTask("deadline submit report"));
-        assertThrows(InvalidDeadlineFormatException.class,
-                () -> Parser.createTask("deadline submit report /by tomorrow"));
+        assertThrows(InvalidDeadlineFormatException.class, () ->
+                Parser.createTask("deadline submit report"));
+        assertThrows(InvalidDeadlineFormatException.class, () ->
+                Parser.createTask("deadline submit report /by tomorrow"));
     }
 
     @Test
     public void createTask_invalidEventDetails_exceptionThrown() {
-        assertThrows(InvalidEventFormatException.class,
-                () -> Parser.createTask("event workshop /from 2026-08-29"));
-        assertThrows(InvalidEventFormatException.class,
-                () -> Parser.createTask("event workshop /from tomorrow /to 2026-08-30"));
-        assertThrows(InvalidEventFormatException.class,
-                () -> Parser.createTask("event workshop /from 2026-08-30 /to 2026-08-29"));
+        assertThrows(InvalidEventFormatException.class, () ->
+                Parser.createTask("event workshop /from 2026-08-29"));
+        assertThrows(InvalidEventFormatException.class, () ->
+                Parser.createTask("event workshop /from tomorrow /to 2026-08-30"));
+        assertThrows(InvalidEventFormatException.class, () ->
+                Parser.createTask("event workshop /from 2026-08-30 /to 2026-08-29"));
     }
 }
