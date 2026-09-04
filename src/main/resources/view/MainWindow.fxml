@@ -7,7 +7,7 @@
     <top>
         <VBox styleClass="header" spacing="5">
             <Label text="RemBot" styleClass="title"/>
-            <Label text="A little help, then back to sleep." styleClass="subtitle"/>
+            <Label text="A little help, then back to sleep..." styleClass="subtitle"/>
         </VBox>
     </top>
     <center>

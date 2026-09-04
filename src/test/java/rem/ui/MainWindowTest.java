@@ -63,8 +63,11 @@ public class MainWindowTest {
             ImageView image = (ImageView) ((StackPane) reply.getChildren().get(0)).getChildren().get(0);
             assertFalse(image.getImage().isError());
             HBox user = (HBox) dialogs.getChildren().get(1);
-            Circle avatar = (Circle) ((StackPane) user.getChildren().get(1)).getChildren().get(0);
-            assertEquals(Color.WHITE, avatar.getFill());
+            ImageView avatar = (ImageView) ((StackPane) user.getChildren().get(1)).getChildren().get(0);
+            assertFalse(avatar.getImage().isError());
+            assertTrue(avatar.getImage().getUrl().endsWith("/images/hidden_king.jpg"));
+            assertTrue(avatar.getClip() instanceof Circle);
+            assertEquals(avatar.getViewport().getWidth(), avatar.getViewport().getHeight());
             for (int width : new int[]{380, 800}) {
                 root.resize(width, 600);
                 root.applyCss();

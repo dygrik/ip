@@ -1,13 +1,17 @@
 .root {
     -fx-background-color: black;
+    -fx-background-image: url("../images/rem_background.png");
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+    -fx-background-repeat: no-repeat;
     -fx-font-family: "Segoe UI";
     -fx-font-size: 14px;
 }
-.header { -fx-padding: 24 24 18 24; }
+.header { -fx-padding: 24 24 18 24; -fx-background-color: rgba(0, 0, 0, 0.65); }
 .title { -fx-text-fill: white; -fx-font-size: 26px; -fx-font-weight: bold; }
 .subtitle { -fx-text-fill: #a7abb8; -fx-font-size: 12px; }
-.conversation { -fx-padding: 16 20 24 20; -fx-background-color: black; }
-.scroll-pane, .scroll-pane > .viewport { -fx-background-color: black; }
+.conversation { -fx-padding: 16 20 24 20; -fx-background-color: transparent; }
+.scroll-pane, .scroll-pane > .viewport { -fx-background-color: transparent; }
 .scroll-pane { -fx-padding: 0; -fx-background-insets: 0; }
 .message {
     -fx-background-color: #202331;
@@ -16,7 +20,7 @@
     -fx-text-fill: #f2f3fa;
 }
 .user-message { -fx-background-color: #35304b; }
-.composer { -fx-padding: 16 20 20 20; }
+.composer { -fx-padding: 16 20 20 20; -fx-background-color: rgba(0, 0, 0, 0.65); }
 .text-field {
     -fx-background-color: #17181e;
     -fx-text-fill: white;

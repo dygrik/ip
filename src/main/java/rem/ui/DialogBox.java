@@ -5,19 +5,21 @@ import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 /**
- * Displays a wrapping message beside Rem's picture or the user's white circle.
+ * Displays a wrapping message beside the speaker's circular profile picture.
  */
 public class DialogBox extends HBox {
     private static final Image REM_IMAGE = new Image(DialogBox.class.getResource("/images/rem.jpeg").toExternalForm());
+    private static final Image USER_IMAGE =
+            new Image(DialogBox.class.getResource("/images/hidden_king.jpg").toExternalForm());
     @FXML
     private Label dialog;
     @FXML
@@ -40,18 +42,23 @@ public class DialogBox extends HBox {
         }
         dialog.setText(text);
         dialog.maxWidthProperty().bind(widthProperty().subtract(90));
+        Image profile = isUser ? USER_IMAGE : REM_IMAGE;
+        ImageView picture = new ImageView(profile);
+        // Crop the center to a square so landscape profile pictures are not stretched.
+        double side = Math.min(profile.getWidth(), profile.getHeight());
+        double cropX = (profile.getWidth() - side) / 2;
+        double cropY = (profile.getHeight() - side) / 2;
+        picture.setViewport(new Rectangle2D(cropX, cropY, side, side));
+        picture.setFitWidth(48);
+        picture.setFitHeight(48);
+        picture.setClip(new Circle(24, 24, 24));
+        avatar.getChildren().add(picture);
         if (isUser) {
-            avatar.getChildren().add(new Circle(24, Color.WHITE));
             avatar.setAccessibleText("You");
             getChildren().setAll(dialog, avatar);
             setAlignment(Pos.TOP_RIGHT);
             dialog.getStyleClass().add("user-message");
         } else {
-            ImageView picture = new ImageView(REM_IMAGE);
-            picture.setFitWidth(48);
-            picture.setFitHeight(48);
-            picture.setClip(new Circle(24, 24, 24));
-            avatar.getChildren().add(picture);
             avatar.setAccessibleText("RemBot");
         }
     }
