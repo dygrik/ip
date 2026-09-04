@@ -37,9 +37,8 @@ public class DeleteCommand extends Command {
             throws IOException, InvalidTaskNumberException {
         Task removedTask = tasks.delete(taskNumber);
         storage.saveTasks(tasks.getTasks());
-        ui.showMessage("One less thing to do! Removed:");
-        ui.showMessage(removedTask.toString());
-        ui.showMessage("Now we are only left with " + tasks.size()
-                + (tasks.size() == 1 ? " task" : " tasks") + " in the list.");
+        ui.showMessages("One less thing to do! Removed:", removedTask.toString(),
+                "Now we are only left with " + tasks.size()
+                        + (tasks.size() == 1 ? " task" : " tasks") + " in the list.");
     }
 }

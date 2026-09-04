@@ -78,6 +78,17 @@ public class Ui implements AutoCloseable {
     }
 
     /**
+     * Displays each supplied message in order, or nothing if no messages are supplied.
+     *
+     * @param messages Lines spoken by Rem.
+     */
+    public void showMessages(String... messages) {
+        for (String message : messages) {
+            showMessage(message);
+        }
+    }
+
+    /**
      * Displays the separator between command responses.
      */
     public void showSeparator() {
