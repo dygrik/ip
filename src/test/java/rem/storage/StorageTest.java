@@ -45,6 +45,11 @@ public class StorageTest {
                 LocalDateTime.of(2026, 8, 31, 17, 0));
 
         storage.saveTasks(List.of(todo, deadline, event));
+        assertEquals(List.of(
+                "T | 1 | read book",
+                "D | 0 | submit report | 2026-08-29 1800",
+                "E | 0 | conference | 2026-08-30 0900 | 2026-08-31 1700"),
+                Files.readAllLines(dataFile));
         ArrayList<Task> loadedTasks = storage.loadTasks();
 
         assertEquals(3, loadedTasks.size());

@@ -34,8 +34,7 @@ public class AddCommand extends Command {
     public void execute(TaskList tasks, Ui ui, Storage storage) throws IOException {
         tasks.add(task);
         storage.saveTasks(tasks.getTasks());
-        ui.showMessage("Ok! I've added this:");
-        ui.showMessage(task.toString());
+        ui.showMessages("Ok! I've added this:", task.toString());
         if (tasks.size() == 1) {
             ui.showMessage("Yay! Our first task!");
         } else {

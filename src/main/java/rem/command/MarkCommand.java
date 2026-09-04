@@ -37,7 +37,6 @@ public class MarkCommand extends Command {
             throws IOException, InvalidTaskNumberException {
         Task task = tasks.mark(taskNumber);
         storage.saveTasks(tasks.getTasks());
-        ui.showMessage("We did it! I've marked this task as done:");
-        ui.showMessage(task.toString());
+        ui.showMessages("We did it! I've marked this task as done:", task.toString());
     }
 }

@@ -85,15 +85,15 @@ public class Storage {
     private static String toDataLine(Task task) {
         String status = task.isDone() ? "1" : "0";
         if (task instanceof Deadline deadline) {
-            return "D | " + status + " | " + deadline.getDescription() + " | "
-                    + TaskDateTime.formatForStorage(deadline.getBy());
+            return String.join(" | ", "D", status, deadline.getDescription(),
+                    TaskDateTime.formatForStorage(deadline.getBy()));
         }
         if (task instanceof Event event) {
-            return "E | " + status + " | " + event.getDescription() + " | "
-                    + TaskDateTime.formatForStorage(event.getFrom()) + " | "
-                    + TaskDateTime.formatForStorage(event.getTo());
+            return String.join(" | ", "E", status, event.getDescription(),
+                    TaskDateTime.formatForStorage(event.getFrom()),
+                    TaskDateTime.formatForStorage(event.getTo()));
         }
-        return "T | " + status + " | " + task.getDescription();
+        return String.join(" | ", "T", status, task.getDescription());
     }
 
     /**

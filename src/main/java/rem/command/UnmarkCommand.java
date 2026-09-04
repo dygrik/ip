@@ -37,7 +37,6 @@ public class UnmarkCommand extends Command {
             throws IOException, InvalidTaskNumberException {
         Task task = tasks.unmark(taskNumber);
         storage.saveTasks(tasks.getTasks());
-        ui.showMessage("Aww ok... I've marked this task as not done yet:");
-        ui.showMessage(task.toString());
+        ui.showMessages("Aww ok... I've marked this task as not done yet:", task.toString());
     }
 }
