@@ -40,8 +40,6 @@ public class OnCommand extends Command {
         }
 
         ui.showMessage("Here's what's scheduled on " + TaskDateTime.format(date) + ":");
-        for (int i = 0; i < scheduledTasks.size(); i++) {
-            ui.showMessage((i + 1) + "." + scheduledTasks.get(i));
-        }
+        ui.showNumberedTasks(scheduledTasks);
     }
 }

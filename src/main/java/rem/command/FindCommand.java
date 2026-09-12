@@ -33,8 +33,6 @@ public class FindCommand extends Command {
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         List<Task> matchingTasks = tasks.findTasks(keyword);
         ui.showMessage("Here are the matching tasks in your list:");
-        for (int i = 0; i < matchingTasks.size(); i++) {
-            ui.showMessage((i + 1) + "." + matchingTasks.get(i));
-        }
+        ui.showNumberedTasks(matchingTasks);
     }
 }
