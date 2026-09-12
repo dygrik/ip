@@ -9,17 +9,21 @@ import rem.command.AddCommand;
 import rem.command.Command;
 import rem.command.CommandType;
 import rem.command.DeleteCommand;
+import rem.command.DeleteNoteCommand;
 import rem.command.ExitCommand;
 import rem.command.FindCommand;
 import rem.command.ListCommand;
 import rem.command.MarkCommand;
+import rem.command.NoteCommand;
 import rem.command.OnCommand;
 import rem.command.UnmarkCommand;
 import rem.exception.EmptyDescriptionException;
+import rem.exception.EmptyNoteException;
 import rem.exception.InvalidDateException;
 import rem.exception.InvalidDeadlineFormatException;
 import rem.exception.InvalidEventFormatException;
 import rem.exception.InvalidTaskNumberException;
+import rem.exception.NoteTooLongException;
 import rem.exception.RemException;
 import rem.exception.UnknownCommandException;
 import rem.task.Deadline;
@@ -50,6 +54,8 @@ public class Parser {
             case MARK -> new MarkCommand(parseTaskNumber(command, "mark"));
             case UNMARK -> new UnmarkCommand(parseTaskNumber(command, "unmark"));
             case DELETE -> new DeleteCommand(parseTaskNumber(command, "delete"));
+            case NOTE -> createNoteCommand(command);
+            case DELETENOTE -> new DeleteNoteCommand(parseTaskNumber(command, "deletenote"));
             case TODO, DEADLINE, EVENT -> new AddCommand(createTask(command));
             case UNKNOWN -> throw new UnknownCommandException();
         };
@@ -138,21 +144,98 @@ public class Parser {
      * @throws RemException If the task description or date-time arguments are invalid.
      */
     public static Task createTask(String command) throws RemException {
-        String lowerCommand = command.toLowerCase(Locale.ROOT);
-        if (isCommand(command, "todo")) {
-            String description = command.substring(4).trim();
+        int noteIndex = findNoteIndex(command);
+        String taskCommand = noteIndex < 0 ? command : command.substring(0, noteIndex).trim();
+        String note = noteIndex < 0 ? null : command.substring(noteIndex + 6).strip();
+        String lowerCommand = taskCommand.toLowerCase(Locale.ROOT);
+        Task task;
+        if (isCommand(taskCommand, "todo")) {
+            String description = taskCommand.substring(4).trim();
             if (description.isEmpty()) {
                 throw new EmptyDescriptionException();
             }
-            return new Todo(description);
+            task = new Todo(description);
+        } else if (isCommand(taskCommand, "deadline")) {
+            task = createDeadline(taskCommand, lowerCommand);
+        } else {
+            assert isCommand(taskCommand, "event")
+                    : "Add command must be a todo, deadline, or event";
+            task = createEvent(taskCommand, lowerCommand);
         }
 
-        if (isCommand(command, "deadline")) {
-            return createDeadline(command, lowerCommand);
+        if (note != null) {
+            validateNote(note);
+            task.setNote(note);
         }
-        assert isCommand(command, "event")
-                : "Add command must be a todo, deadline, or event";
-        return createEvent(command, lowerCommand);
+        return task;
+    }
+
+    /**
+     * Creates a command that adds or replaces a task's note.
+     *
+     * @param command Full note command.
+     * @return Command containing the selected task number and validated note.
+     * @throws RemException If the task number or note is invalid.
+     */
+    private static NoteCommand createNoteCommand(String command) throws RemException {
+        String arguments = command.substring(4).strip();
+        if (arguments.isEmpty()) {
+            throw new InvalidTaskNumberException();
+        }
+
+        String[] argumentParts = arguments.split("\\s+", 2);
+        int taskNumber = parseTaskNumber("note " + argumentParts[0], "note");
+        if (argumentParts.length < 2) {
+            throw new EmptyNoteException();
+        }
+        String note = argumentParts[1].strip();
+        validateNote(note);
+        return new NoteCommand(taskNumber, note);
+    }
+
+    /**
+     * Finds the first standalone note field in a task-creation command.
+     *
+     * @param command Full task-creation command.
+     * @return Index of the whitespace before {@code /note}, or {@code -1} if absent.
+     */
+    private static int findNoteIndex(String command) {
+        String lowerCommand = command.toLowerCase(Locale.ROOT);
+        int searchIndex = 0;
+        while (searchIndex < lowerCommand.length()) {
+            int slashIndex = lowerCommand.indexOf("/note", searchIndex);
+            if (slashIndex < 0) {
+                return -1;
+            }
+            int characterAfterNote = slashIndex + 5;
+            boolean hasWhitespaceBefore = slashIndex > 0
+                    && Character.isWhitespace(lowerCommand.charAt(slashIndex - 1));
+            if (characterAfterNote == lowerCommand.length()
+                    || Character.isWhitespace(lowerCommand.charAt(characterAfterNote))) {
+                if (hasWhitespaceBefore) {
+                    return slashIndex - 1;
+                }
+            }
+            searchIndex = characterAfterNote;
+        }
+        return -1;
+    }
+
+    /**
+     * Validates a trimmed, single-line note.
+     *
+     * @param note Note to validate.
+     * @throws EmptyNoteException If the note is blank.
+     * @throws NoteTooLongException If the note exceeds the maximum length.
+     */
+    private static void validateNote(String note)
+            throws EmptyNoteException, NoteTooLongException {
+        if (note.isBlank()) {
+            throw new EmptyNoteException();
+        }
+        if (note.codePointCount(0, note.length()) > Task.MAX_NOTE_LENGTH) {
+            throw new NoteTooLongException();
+        }
     }
 
     /**

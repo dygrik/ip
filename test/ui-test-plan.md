@@ -648,6 +648,135 @@ Rem: [Yawn] Need more sleep. Time for bed...
 ____________________________________________________________
 ```
 
+## TC-13: Create, replace, find, and delete notes
+
+**Aim:** Verify that notes can be added during task creation, replaced after creation, found by
+their text, retained when marking a task, removed, and saved in the backward-compatible format.
+After the process exits, `data/rem.txt` must contain these lines followed by a newline:
+
+```text
+T | 1 | read book | N:Qm9ycm93IGl0IGZyb20gQWxpY2U=
+D | 0 | submit report | 2026-10-01 1800
+```
+
+**Inputs:**
+
+```text
+todo read book /note Borrow it from Alice
+deadline submit report /by 2026-10-01 1800 /note Include appendix
+note 2 Include the references
+find references
+mark 1
+deletenote 2
+deletenote 2
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____                      
+|  _ \    ___    _ __ ___  
+| |_) |  / _ \  | '_ ` _ \ 
+|  _ <  |  __/  | | | | | |
+|_| \_\  \___|  |_| |_| |_|
+Rem: Hello! I'm Rem!
+Rem: No more sleeping. Need help?
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: Ok! I've added this:
+Rem: [T][ ] read book
+Rem:   Note: Borrow it from Alice
+Rem: Yay! Our first task!
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: Ok! I've added this:
+Rem: [D][ ] submit report (by: Oct 01 2026, 6:00 PM)
+Rem:   Note: Include appendix
+Rem: Now you have 2 tasks in the list.
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: Hmm... Rem will try his best to remember:
+Rem: [D][ ] submit report (by: Oct 01 2026, 6:00 PM)
+Rem:   Note: Include the references
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: Here are the matching tasks in your list:
+Rem: 1.[D][ ] submit report (by: Oct 01 2026, 6:00 PM)
+Rem:   Note: Include the references
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: We did it! I've marked this task as done:
+Rem: [T][X] read book
+Rem:   Note: Borrow it from Alice
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: Phew, Rem kinda forgot what the note was:
+Rem: [D][ ] submit report (by: Oct 01 2026, 6:00 PM)
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: You didn't give Rem anything to remember though...
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: Hmm... what to do now?
+Rem: 1.[T][X] read book
+Rem:   Note: Borrow it from Alice
+Rem: 2.[D][ ] submit report (by: Oct 01 2026, 6:00 PM)
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: [Yawn] Need more sleep. Time for bed...
+____________________________________________________________
+```
+
+## TC-14: Reject missing note text
+
+**Aim:** Verify that both creation-time and post-creation note commands reject missing note text
+without changing the task.
+
+**Inputs:**
+
+```text
+todo read book
+note 1
+todo another task /note
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____                      
+|  _ \    ___    _ __ ___  
+| |_) |  / _ \  | '_ ` _ \ 
+|  _ <  |  __/  | | | | | |
+|_| \_\  \___|  |_| |_| |_|
+Rem: Hello! I'm Rem!
+Rem: No more sleeping. Need help?
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: Ok! I've added this:
+Rem: [T][ ] read book
+Rem: Yay! Our first task!
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: You didn't say what Rem should remember...
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: You didn't say what Rem should remember...
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: Hmm... what to do now?
+Rem: 1.[T][ ] read book
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: [Yawn] Need more sleep. Time for bed...
+____________________________________________________________
+```
+
 ## Graphical interface regression checks
 
 Run `gradlew test` on a desktop with Java 25. `MainWindowTest` loads the actual FXML and CSS

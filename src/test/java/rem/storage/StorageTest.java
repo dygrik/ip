@@ -1,15 +1,18 @@
 package rem.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -40,13 +43,14 @@ public class StorageTest {
         Storage storage = new Storage(dataFile.toString());
         Todo todo = new Todo("read book");
         todo.markAsDone();
+        todo.setNote("Borrow it from Alice | return Friday");
         Deadline deadline = new Deadline("submit report", LocalDateTime.of(2026, 8, 29, 18, 0));
         Event event = new Event("conference", LocalDateTime.of(2026, 8, 30, 9, 0),
                 LocalDateTime.of(2026, 8, 31, 17, 0));
 
         storage.saveTasks(List.of(todo, deadline, event));
         assertEquals(List.of(
-                "T | 1 | read book",
+                "T | 1 | read book | N:Qm9ycm93IGl0IGZyb20gQWxpY2UgfCByZXR1cm4gRnJpZGF5",
                 "D | 0 | submit report | 2026-08-29 1800",
                 "E | 0 | conference | 2026-08-30 0900 | 2026-08-31 1700"),
                 Files.readAllLines(dataFile));
@@ -56,6 +60,7 @@ public class StorageTest {
         assertInstanceOf(Todo.class, loadedTasks.get(0));
         assertTrue(loadedTasks.get(0).isDone());
         assertEquals("read book", loadedTasks.get(0).getDescription());
+        assertEquals("Borrow it from Alice | return Friday", loadedTasks.get(0).getNote());
         Deadline loadedDeadline = assertInstanceOf(Deadline.class, loadedTasks.get(1));
         assertEquals(deadline.getBy(), loadedDeadline.getBy());
         Event loadedEvent = assertInstanceOf(Event.class, loadedTasks.get(2));
@@ -106,6 +111,30 @@ public class StorageTest {
         assertThrows(IOException.class, () -> new Storage(unknownTypeFile.toString()).loadTasks());
         assertThrows(IOException.class, () -> new Storage(invalidDateFile.toString()).loadTasks());
         assertThrows(IOException.class, () -> new Storage(reversedEventFile.toString()).loadTasks());
+    }
+
+    @Test
+    public void loadTasks_oldFormat_tasksHaveNoNotes() throws IOException {
+        Path dataFile = temporaryDirectory.resolve("old.txt");
+        Files.writeString(dataFile, "T | 0 | old task\n");
+
+        Task task = new Storage(dataFile.toString()).loadTasks().get(0);
+
+        assertFalse(task.hasNote());
+    }
+
+    @Test
+    public void loadTasks_malformedNote_exceptionThrown() throws IOException {
+        Path invalidBase64File = temporaryDirectory.resolve("invalid-base64.txt");
+        Files.writeString(invalidBase64File, "T | 0 | task | N:not-base64!\n");
+        Path tooLongFile = temporaryDirectory.resolve("too-long.txt");
+        String encodedNote = Base64.getEncoder().encodeToString(
+                "a".repeat(201).getBytes(StandardCharsets.UTF_8));
+        Files.writeString(tooLongFile, "T | 0 | task | N:" + encodedNote + "\n");
+
+        assertThrows(IOException.class, () ->
+                new Storage(invalidBase64File.toString()).loadTasks());
+        assertThrows(IOException.class, () -> new Storage(tooLongFile.toString()).loadTasks());
     }
 
     @Test

@@ -55,13 +55,13 @@ public class Event extends Task {
     }
 
     /**
-     * Returns this event's completion status, description, and time range.
+     * Returns this event's completion status, description, time range, and optional note.
      *
      * @return Display representation of this event.
      */
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (from: " + TaskDateTime.format(from)
-                + " to: " + TaskDateTime.format(to) + ")";
+        return formatWithNote("[E]" + getTaskDetails() + " (from: " + TaskDateTime.format(from)
+                + " to: " + TaskDateTime.format(to) + ")");
     }
 }

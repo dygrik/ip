@@ -41,12 +41,13 @@ public class Deadline extends Task {
     }
 
     /**
-     * Returns this deadline's completion status, description, and due date.
+     * Returns this deadline's completion status, description, due date, and optional note.
      *
      * @return Display representation of this deadline.
      */
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + TaskDateTime.format(by) + ")";
+        return formatWithNote("[D]" + getTaskDetails()
+                + " (by: " + TaskDateTime.format(by) + ")");
     }
 }

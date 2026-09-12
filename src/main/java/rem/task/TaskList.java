@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Locale;
 
 import rem.exception.InvalidTaskNumberException;
+import rem.exception.MissingNoteException;
 
 /**
  * Stores Rem's tasks and provides operations for managing them.
@@ -104,6 +105,40 @@ public class TaskList {
     }
 
     /**
+     * Adds or replaces a task's note.
+     *
+     * @param taskNumber One-based number of the task to update.
+     * @param note Valid, trimmed note text.
+     * @return The updated task.
+     * @throws InvalidTaskNumberException If the task number does not exist.
+     */
+    public Task setNote(int taskNumber, String note) throws InvalidTaskNumberException {
+        validateTaskNumber(taskNumber);
+        Task task = getTask(taskNumber);
+        task.setNote(note);
+        return task;
+    }
+
+    /**
+     * Removes a task's note.
+     *
+     * @param taskNumber One-based number of the task to update.
+     * @return The updated task.
+     * @throws InvalidTaskNumberException If the task number does not exist.
+     * @throws MissingNoteException If the selected task has no note.
+     */
+    public Task deleteNote(int taskNumber)
+            throws InvalidTaskNumberException, MissingNoteException {
+        validateTaskNumber(taskNumber);
+        Task task = getTask(taskNumber);
+        if (!task.hasNote()) {
+            throw new MissingNoteException();
+        }
+        task.deleteNote();
+        return task;
+    }
+
+    /**
      * Finds deadlines due and events occurring on a date.
      *
      * @param date Date to search for.
@@ -117,7 +152,7 @@ public class TaskList {
     }
 
     /**
-     * Finds tasks whose descriptions contain a keyword, ignoring letter case.
+     * Finds tasks whose descriptions or notes contain a keyword, ignoring letter case.
      *
      * @param keyword Keyword to search for.
      * @return Matching tasks in their task-list order.
@@ -125,7 +160,9 @@ public class TaskList {
     public List<Task> findTasks(String keyword) {
         String lowerKeyword = keyword.toLowerCase(Locale.ROOT);
         return tasks.stream()
-                .filter(task -> task.getDescription().toLowerCase(Locale.ROOT).contains(lowerKeyword))
+                .filter(task -> task.getDescription().toLowerCase(Locale.ROOT).contains(lowerKeyword)
+                        || task.hasNote()
+                        && task.getNote().toLowerCase(Locale.ROOT).contains(lowerKeyword))
                 .toList();
     }
 

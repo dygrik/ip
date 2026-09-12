@@ -26,7 +26,7 @@ public class Ui implements AutoCloseable {
      */
     public Ui() {
         scanner = new Scanner(System.in);
-        output = message -> System.out.println("Rem: " + message);
+        output = message -> message.lines().forEach(line -> System.out.println("Rem: " + line));
     }
 
     /**
@@ -72,7 +72,7 @@ public class Ui implements AutoCloseable {
     }
 
     /**
-     * Displays one line spoken by Rem.
+     * Displays one message spoken by Rem.
      *
      * @param message Message to display.
      */

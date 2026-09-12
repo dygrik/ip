@@ -14,12 +14,12 @@ public class Todo extends Task {
     }
 
     /**
-     * Returns this to-do's type, completion status, and description.
+     * Returns this to-do's type, completion status, description, and optional note.
      *
      * @return Display representation of this to-do.
      */
     @Override
     public String toString() {
-        return "[T]" + super.toString();
+        return formatWithNote("[T]" + getTaskDetails());
     }
 }

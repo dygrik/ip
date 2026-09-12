@@ -1,11 +1,16 @@
 package rem.storage;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import rem.task.Deadline;
@@ -18,6 +23,8 @@ import rem.task.Todo;
  * Loads and saves Rem's tasks using a local data file.
  */
 public class Storage {
+    private static final String NOTE_PREFIX = "N:";
+
     private final Path dataFile;
 
     /**
@@ -84,17 +91,25 @@ public class Storage {
      */
     private static String toDataLine(Task task) {
         String status = task.isDone() ? "1" : "0";
+        String taskData;
         if (task instanceof Deadline deadline) {
-            return String.join(" | ", "D", status, deadline.getDescription(),
+            taskData = String.join(" | ", "D", status, deadline.getDescription(),
                     TaskDateTime.formatForStorage(deadline.getBy()));
-        }
-        if (task instanceof Event event) {
-            return String.join(" | ", "E", status, event.getDescription(),
+        } else if (task instanceof Event event) {
+            taskData = String.join(" | ", "E", status, event.getDescription(),
                     TaskDateTime.formatForStorage(event.getFrom()),
                     TaskDateTime.formatForStorage(event.getTo()));
+        } else {
+            assert task instanceof Todo : "Storage only supports todo, deadline, and event tasks";
+            taskData = String.join(" | ", "T", status, task.getDescription());
         }
-        assert task instanceof Todo : "Storage only supports todo, deadline, and event tasks";
-        return String.join(" | ", "T", status, task.getDescription());
+
+        if (!task.hasNote()) {
+            return taskData;
+        }
+        String encodedNote = Base64.getEncoder().encodeToString(
+                task.getNote().getBytes(StandardCharsets.UTF_8));
+        return taskData + " | " + NOTE_PREFIX + encodedNote;
     }
 
     /**
@@ -113,12 +128,13 @@ public class Storage {
         return switch (taskParts[0]) {
             case "T" -> {
                 validateParts(taskParts, 3, lineNumber);
-                yield new Todo(taskParts[2]);
+                yield applyNote(new Todo(taskParts[2]), taskParts, 3, lineNumber);
             }
             case "D" -> {
                 validateParts(taskParts, 4, lineNumber);
                 try {
-                    yield new Deadline(taskParts[2], TaskDateTime.parse(taskParts[3]));
+                    Task deadline = new Deadline(taskParts[2], TaskDateTime.parse(taskParts[3]));
+                    yield applyNote(deadline, taskParts, 4, lineNumber);
                 } catch (DateTimeParseException e) {
                     throw invalidDataLine(lineNumber);
                 }
@@ -131,7 +147,8 @@ public class Storage {
                     if (to.isBefore(from)) {
                         throw invalidDataLine(lineNumber);
                     }
-                    yield new Event(taskParts[2], from, to);
+                    Task event = new Event(taskParts[2], from, to);
+                    yield applyNote(event, taskParts, 5, lineNumber);
                 } catch (DateTimeParseException e) {
                     throw invalidDataLine(lineNumber);
                 }
@@ -150,13 +167,56 @@ public class Storage {
      */
     private static void validateParts(String[] taskParts, int expectedCount,
             int lineNumber) throws IOException {
-        if (taskParts.length != expectedCount) {
+        if (taskParts.length != expectedCount && taskParts.length != expectedCount + 1) {
             throw invalidDataLine(lineNumber);
         }
-        for (int i = 2; i < taskParts.length; i++) {
+        for (int i = 2; i < expectedCount; i++) {
             if (taskParts[i].isBlank()) {
                 throw invalidDataLine(lineNumber);
             }
+        }
+    }
+
+    /**
+     * Decodes and attaches an optional final note field.
+     *
+     * @param task Task reconstructed from the required fields.
+     * @param taskParts All fields from the storage line.
+     * @param requiredCount Number of fields required when the task has no note.
+     * @param lineNumber One-based line number used in error messages.
+     * @return Reconstructed task with its note attached when present.
+     * @throws IOException If the note field is malformed.
+     */
+    private static Task applyNote(Task task, String[] taskParts, int requiredCount,
+            int lineNumber) throws IOException {
+        if (taskParts.length == requiredCount) {
+            return task;
+        }
+
+        String noteField = taskParts[requiredCount];
+        if (!noteField.startsWith(NOTE_PREFIX)) {
+            throw invalidDataLine(lineNumber);
+        }
+        String encodedNote = noteField.substring(NOTE_PREFIX.length());
+        try {
+            byte[] noteBytes = Base64.getDecoder().decode(encodedNote);
+            if (!Base64.getEncoder().encodeToString(noteBytes).equals(encodedNote)) {
+                throw invalidDataLine(lineNumber);
+            }
+            String note = StandardCharsets.UTF_8.newDecoder()
+                    .onMalformedInput(CodingErrorAction.REPORT)
+                    .onUnmappableCharacter(CodingErrorAction.REPORT)
+                    .decode(ByteBuffer.wrap(noteBytes))
+                    .toString();
+            if (note.isBlank() || !note.equals(note.strip())
+                    || note.contains("\n") || note.contains("\r")
+                    || note.codePointCount(0, note.length()) > Task.MAX_NOTE_LENGTH) {
+                throw invalidDataLine(lineNumber);
+            }
+            task.setNote(note);
+            return task;
+        } catch (IllegalArgumentException | CharacterCodingException e) {
+            throw invalidDataLine(lineNumber);
         }
     }
 

@@ -14,6 +14,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import rem.exception.InvalidTaskNumberException;
+import rem.exception.MissingNoteException;
 
 /**
  * Tests the core task mutation and scheduling operations of {@link TaskList}.
@@ -79,6 +80,27 @@ public class TaskListTest {
     }
 
     @Test
+    public void setAndDeleteNote_validTask_noteUpdatedAndRemoved()
+            throws InvalidTaskNumberException, MissingNoteException {
+        Todo todo = new Todo("read book");
+        TaskList tasks = new TaskList(List.of(todo));
+
+        assertSame(todo, tasks.setNote(1, "Borrow it from Alice"));
+        assertEquals("Borrow it from Alice", todo.getNote());
+        assertSame(todo, tasks.setNote(1, "Return it tomorrow"));
+        assertEquals("Return it tomorrow", todo.getNote());
+        assertSame(todo, tasks.deleteNote(1));
+        assertFalse(todo.hasNote());
+    }
+
+    @Test
+    public void deleteNote_taskWithoutNote_exceptionThrown() {
+        TaskList tasks = new TaskList(List.of(new Todo("read book")));
+
+        assertThrows(MissingNoteException.class, () -> tasks.deleteNote(1));
+    }
+
+    @Test
     public void findTasksOn_matchingScheduledTasks_matchesInOriginalOrder() {
         LocalDate target = LocalDate.of(2026, 8, 29);
         Todo todo = new Todo("not scheduled");
@@ -100,6 +122,18 @@ public class TaskListTest {
         TaskList tasks = new TaskList(List.of(firstMatch, secondMatch, nonMatch));
 
         assertEquals(List.of(firstMatch, secondMatch), tasks.findTasks("BOOK"));
+    }
+
+    @Test
+    public void findTasks_keywordInDescriptionOrNote_eachTaskReturnedOnce() {
+        Todo descriptionMatch = new Todo("Call Alice");
+        Todo noteMatch = new Todo("read book");
+        noteMatch.setNote("Borrow it from ALICE");
+        Todo doubleMatch = new Todo("Meet Alice");
+        doubleMatch.setNote("Ask Alice about class");
+        TaskList tasks = new TaskList(List.of(descriptionMatch, noteMatch, doubleMatch));
+
+        assertEquals(List.of(descriptionMatch, noteMatch, doubleMatch), tasks.findTasks("alice"));
     }
 
     @Test

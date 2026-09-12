@@ -54,12 +54,16 @@ public class MainWindowTest {
             ScrollPane scroll = (ScrollPane) loader.getNamespace().get("scrollPane");
             input.setText("todo read book");
             send.fire();
+            input.setText("note 1 Borrow it from Alice");
+            send.fire();
             input.setText("list");
             input.fireEvent(new ActionEvent());
-            assertEquals(5, dialogs.getChildren().size());
+            assertEquals(7, dialogs.getChildren().size());
             assertEquals("", input.getText());
-            HBox reply = (HBox) dialogs.getChildren().get(4);
+            HBox reply = (HBox) dialogs.getChildren().get(6);
             assertTrue(((Label) reply.getChildren().get(1)).getText().contains("1.[T][ ] read book"));
+            assertTrue(((Label) reply.getChildren().get(1)).getText()
+                    .contains("Note: Borrow it from Alice"));
             ImageView image = (ImageView) ((StackPane) reply.getChildren().get(0)).getChildren().get(0);
             assertFalse(image.getImage().isError());
             HBox user = (HBox) dialogs.getChildren().get(1);
