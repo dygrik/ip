@@ -99,8 +99,19 @@ public class StorageTest {
         Files.writeString(unknownTypeFile, "X | 0 | task\n");
         Path invalidDateFile = temporaryDirectory.resolve("invalid-date.txt");
         Files.writeString(invalidDateFile, "D | 0 | task | tomorrow\n");
+        Path reversedEventFile = temporaryDirectory.resolve("reversed-event.txt");
+        Files.writeString(reversedEventFile,
+                "E | 0 | event | 2026-08-30 0900 | 2026-08-29 1700\n");
 
         assertThrows(IOException.class, () -> new Storage(unknownTypeFile.toString()).loadTasks());
         assertThrows(IOException.class, () -> new Storage(invalidDateFile.toString()).loadTasks());
+        assertThrows(IOException.class, () -> new Storage(reversedEventFile.toString()).loadTasks());
+    }
+
+    @Test
+    public void saveTasks_unsupportedTaskSubtype_assertionErrorThrown() {
+        Storage storage = new Storage(temporaryDirectory.resolve("tasks.txt").toString());
+
+        assertThrows(AssertionError.class, () -> storage.saveTasks(List.of(new Task("unsupported"))));
     }
 }

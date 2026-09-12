@@ -150,6 +150,8 @@ public class Parser {
         if (isCommand(command, "deadline")) {
             return createDeadline(command, lowerCommand);
         }
+        assert isCommand(command, "event")
+                : "Add command must be a todo, deadline, or event";
         return createEvent(command, lowerCommand);
     }
 
