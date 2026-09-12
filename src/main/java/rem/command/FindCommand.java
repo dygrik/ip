@@ -8,7 +8,7 @@ import rem.task.TaskList;
 import rem.ui.Ui;
 
 /**
- * Displays tasks whose descriptions contain a keyword.
+ * Displays tasks whose descriptions or notes contain a keyword.
  */
 public class FindCommand extends Command {
     private final String keyword;
@@ -23,7 +23,7 @@ public class FindCommand extends Command {
     }
 
     /**
-     * Displays tasks with descriptions matching this command's keyword.
+     * Displays tasks with descriptions or notes matching this command's keyword.
      *
      * @param tasks Tasks managed by Rem.
      * @param ui User interface used to display the results.

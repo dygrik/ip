@@ -1,6 +1,7 @@
 package rem.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -11,11 +12,15 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
 import rem.command.CommandType;
+import rem.command.DeleteNoteCommand;
+import rem.command.NoteCommand;
 import rem.exception.EmptyDescriptionException;
+import rem.exception.EmptyNoteException;
 import rem.exception.InvalidDateException;
 import rem.exception.InvalidDeadlineFormatException;
 import rem.exception.InvalidEventFormatException;
 import rem.exception.InvalidTaskNumberException;
+import rem.exception.NoteTooLongException;
 import rem.exception.RemException;
 import rem.task.Deadline;
 import rem.task.Event;
@@ -96,6 +101,54 @@ public class ParserTest {
 
         assertInstanceOf(Todo.class, task);
         assertEquals("read book", task.getDescription());
+    }
+
+    @Test
+    public void createTask_allTaskTypesWithNotes_notesAttached() throws RemException {
+        Task todo = Parser.createTask("todo read book /note Borrow it from Alice");
+        Task deadline = Parser.createTask(
+                "deadline submit report /by 2026-08-29 /note Include /by details");
+        Task event = Parser.createTask("event workshop /from 2026-08-29 0900 "
+                + "/to 2026-08-29 1700 /note Bring notes");
+
+        assertEquals("Borrow it from Alice", todo.getNote());
+        assertEquals("Include /by details", deadline.getNote());
+        assertEquals("Bring notes", event.getNote());
+    }
+
+    @Test
+    public void parse_noteCommands_commandsReturned() throws RemException {
+        assertInstanceOf(NoteCommand.class, Parser.parse("NoTe 2 Remember this"));
+        assertInstanceOf(DeleteNoteCommand.class, Parser.parse("DeLeTeNoTe 2"));
+    }
+
+    @Test
+    public void noteParsing_missingOrTooLongNote_exceptionThrown() {
+        String longNote = "a".repeat(201);
+
+        assertThrows(EmptyNoteException.class, () -> Parser.parse("note 1"));
+        assertThrows(EmptyNoteException.class, () -> Parser.createTask("todo read /note"));
+        assertThrows(NoteTooLongException.class, () -> Parser.parse("note 1 " + longNote));
+        assertThrows(NoteTooLongException.class, () ->
+                Parser.createTask("todo read /note " + longNote));
+    }
+
+    @Test
+    public void noteParsing_twoHundredEmoji_noteAccepted() throws RemException {
+        String note = "😀".repeat(200);
+
+        Task task = Parser.createTask("todo celebrate /note " + note);
+
+        assertEquals(note, task.getNote());
+    }
+
+    @Test
+    public void createTask_noteLikeText_keptInDescription()
+            throws RemException {
+        Task task = Parser.createTask("todo review /noteworthy examples");
+
+        assertEquals("review /noteworthy examples", task.getDescription());
+        assertFalse(task.hasNote());
     }
 
     @Test

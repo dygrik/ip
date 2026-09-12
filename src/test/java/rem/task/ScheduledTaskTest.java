@@ -1,5 +1,6 @@
 package rem.task;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -55,5 +56,19 @@ public class ScheduledTaskTest {
         assertThrows(AssertionError.class, () -> new Event("conference", null, start));
         assertThrows(AssertionError.class, () -> new Event("conference", start, null));
         assertThrows(AssertionError.class, () -> new Event("conference", start, earlierEnd));
+    }
+
+    @Test
+    public void toString_scheduledTasksWithNotes_noteShownAfterSchedule() {
+        Deadline deadline = new Deadline("submit", LocalDateTime.of(2026, 8, 29, 18, 0));
+        deadline.setNote("Include appendix");
+        Event event = new Event("conference", LocalDateTime.of(2026, 8, 30, 9, 0),
+                LocalDateTime.of(2026, 8, 30, 17, 0));
+        event.setNote("Bring pass");
+
+        assertEquals("[D][ ] submit (by: Aug 29 2026, 6:00 PM)\n  Note: Include appendix",
+                deadline.toString());
+        assertEquals("[E][ ] conference (from: Aug 30 2026, 9:00 AM "
+                + "to: Aug 30 2026, 5:00 PM)\n  Note: Bring pass", event.toString());
     }
 }

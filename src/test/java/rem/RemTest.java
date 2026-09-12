@@ -42,6 +42,35 @@ public class RemTest {
     }
 
     @Test
+    public void getResponse_noteReplaceFindDeleteNote_behavesAndPersists() {
+        String path = directory.resolve("rem.txt").toString();
+        Rem rem = new Rem(path);
+        rem.getResponse("todo read book /note Borrow it from Alice");
+
+        assertEquals("Hmm... Rem will try his best to remember:\n"
+                + "[T][ ] read book\n  Note: Return it tomorrow",
+                rem.getResponse("note 1 Return it tomorrow").text());
+        assertTrue(rem.getResponse("find TOMORROW").text().contains("Note: Return it tomorrow"));
+        assertEquals("Phew, Rem kinda forgot what the note was:\n[T][ ] read book",
+                rem.getResponse("deletenote 1").text());
+        assertEquals("You didn't give Rem anything to remember though...",
+                rem.getResponse("deletenote 1").text());
+        assertFalse(new Rem(path).getResponse("list").text().contains("Note:"));
+    }
+
+    @Test
+    public void getResponse_invalidNoteText_exactMessagesReturned() {
+        Rem rem = new Rem(directory.resolve("rem.txt").toString());
+        rem.getResponse("todo read book");
+
+        assertEquals("You didn't say what Rem should remember...",
+                rem.getResponse("note 1").text());
+        assertEquals("Rem can't remember more than 200 characters...",
+                rem.getResponse("note 1 " + "a".repeat(201)).text());
+        assertFalse(rem.getResponse("list").text().contains("Note:"));
+    }
+
+    @Test
     public void getResponse_storageFailure_reportsError() throws IOException {
         Path blocked = Files.createDirectory(directory.resolve("blocked"));
         Rem rem = new Rem(blocked.toString());

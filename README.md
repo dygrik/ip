@@ -8,7 +8,9 @@ Use Java 25 and run `.\gradlew.bat run` to open the JavaFX chat window.
 Send a command with Enter or the Send button. Tasks are saved in `data/rem.txt`
 relative to the directory where you launch Rem. Existing console commands also work
 in the GUI, including `todo`, `deadline`, `event`, `list`, `mark`, `unmark`,
-`delete`, `find`, `on`, and `bye`. The farewell stays visible briefly before closing.
+`delete`, `note`, `deletenote`, `find`, `on`, and `bye`. Add a note while creating a task
+with `/note`, or use `note TASK_NUMBER NOTE` afterward. See the
+[user guide](docs/README.md) for examples. The farewell stays visible briefly before closing.
 
 Build the runnable JAR with `.\gradlew.bat shadowJar`, then run
 `java -jar build/libs/rem.jar`. The bundled JavaFX natives target Windows, macOS,
