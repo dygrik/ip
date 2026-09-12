@@ -18,8 +18,6 @@ public class ListCommand extends Command {
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         ui.showMessage("Hmm... what to do now?");
-        for (int taskNumber = 1; taskNumber <= tasks.size(); taskNumber++) {
-            ui.showMessage(taskNumber + "." + tasks.getTask(taskNumber));
-        }
+        ui.showNumberedTasks(tasks.getTasks());
     }
 }
