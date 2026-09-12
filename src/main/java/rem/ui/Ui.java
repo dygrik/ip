@@ -1,7 +1,10 @@
 package rem.ui;
 
+import java.util.List;
 import java.util.Scanner;
 import java.util.function.Consumer;
+
+import rem.task.Task;
 
 /**
  * Handles console input and output for Rem.
@@ -85,6 +88,17 @@ public class Ui implements AutoCloseable {
     public void showMessages(String... messages) {
         for (String message : messages) {
             showMessage(message);
+        }
+    }
+
+    /**
+     * Displays tasks as a one-based numbered list.
+     *
+     * @param tasks Tasks to display in their current order.
+     */
+    public void showNumberedTasks(List<Task> tasks) {
+        for (int taskIndex = 0; taskIndex < tasks.size(); taskIndex++) {
+            showMessage((taskIndex + 1) + "." + tasks.get(taskIndex));
         }
     }
 
