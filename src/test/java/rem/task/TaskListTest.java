@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -108,5 +109,29 @@ public class TaskListTest {
 
         assertThrows(UnsupportedOperationException.class, () -> snapshot.add(new Todo("write")));
         assertEquals(1, tasks.size());
+    }
+
+    @Test
+    public void constructorOrAdd_nullTask_assertionErrorThrown() {
+        TaskList tasks = new TaskList();
+
+        assertThrows(AssertionError.class, () -> new TaskList(null));
+        assertThrows(AssertionError.class, () -> new TaskList(Arrays.asList((Task) null)));
+        assertThrows(AssertionError.class, () -> tasks.add(null));
+    }
+
+    @Test
+    public void getTask_outOfRangeTaskNumber_assertionErrorThrown() {
+        TaskList tasks = new TaskList(List.of(new Todo("only task")));
+
+        assertThrows(AssertionError.class, () -> tasks.getTask(0));
+        assertThrows(AssertionError.class, () -> tasks.getTask(2));
+    }
+
+    @Test
+    public void taskConstructor_blankDescription_assertionErrorThrown() {
+        assertThrows(AssertionError.class, () -> new Todo(null));
+        assertThrows(AssertionError.class, () -> new Todo(""));
+        assertThrows(AssertionError.class, () -> new Todo("   "));
     }
 }

@@ -1,6 +1,7 @@
 package rem.task;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
@@ -43,5 +44,16 @@ public class ScheduledTaskTest {
 
         assertFalse(event.occursOn(LocalDate.of(2026, 8, 27)));
         assertFalse(event.occursOn(LocalDate.of(2026, 8, 31)));
+    }
+
+    @Test
+    public void constructors_invalidSchedulingDetails_assertionErrorThrown() {
+        LocalDateTime start = LocalDateTime.of(2026, 8, 30, 9, 0);
+        LocalDateTime earlierEnd = LocalDateTime.of(2026, 8, 29, 17, 0);
+
+        assertThrows(AssertionError.class, () -> new Deadline("submit", null));
+        assertThrows(AssertionError.class, () -> new Event("conference", null, start));
+        assertThrows(AssertionError.class, () -> new Event("conference", start, null));
+        assertThrows(AssertionError.class, () -> new Event("conference", start, earlierEnd));
     }
 }

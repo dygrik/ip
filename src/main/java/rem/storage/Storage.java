@@ -3,6 +3,7 @@ package rem.storage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -92,6 +93,7 @@ public class Storage {
                     TaskDateTime.formatForStorage(event.getFrom()),
                     TaskDateTime.formatForStorage(event.getTo()));
         }
+        assert task instanceof Todo : "Storage only supports todo, deadline, and event tasks";
         return String.join(" | ", "T", status, task.getDescription());
     }
 
@@ -124,8 +126,12 @@ public class Storage {
             case "E" -> {
                 validateParts(taskParts, 5, lineNumber);
                 try {
-                    yield new Event(taskParts[2], TaskDateTime.parse(taskParts[3]),
-                            TaskDateTime.parse(taskParts[4]));
+                    LocalDateTime from = TaskDateTime.parse(taskParts[3]);
+                    LocalDateTime to = TaskDateTime.parse(taskParts[4]);
+                    if (to.isBefore(from)) {
+                        throw invalidDataLine(lineNumber);
+                    }
+                    yield new Event(taskParts[2], from, to);
                 } catch (DateTimeParseException e) {
                     throw invalidDataLine(lineNumber);
                 }
