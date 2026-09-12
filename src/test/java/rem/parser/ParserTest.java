@@ -143,4 +143,9 @@ public class ParserTest {
         assertThrows(InvalidEventFormatException.class, () ->
                 Parser.createTask("event workshop /from 2026-08-30 /to 2026-08-29"));
     }
+
+    @Test
+    public void createTask_nonAddCommand_assertionErrorThrown() {
+        assertThrows(AssertionError.class, () -> Parser.createTask("list"));
+    }
 }
