@@ -26,6 +26,9 @@ public class TaskList {
      * @param tasks Initial tasks to store.
      */
     public TaskList(List<Task> tasks) {
+        assert tasks != null : "Initial task list must not be null";
+        assert tasks.stream().noneMatch(task -> task == null)
+                : "Initial task list must not contain null tasks";
         this.tasks = new ArrayList<>(tasks);
     }
 
@@ -45,6 +48,8 @@ public class TaskList {
      * @return The selected task.
      */
     public Task getTask(int taskNumber) {
+        assert taskNumber >= 1 && taskNumber <= tasks.size()
+                : "Task number must identify an existing task";
         return tasks.get(taskNumber - 1);
     }
 
@@ -54,6 +59,7 @@ public class TaskList {
      * @param task Task to add.
      */
     public void add(Task task) {
+        assert task != null : "Task to add must not be null";
         tasks.add(task);
     }
 
