@@ -69,10 +69,9 @@ public class Storage {
             Files.createDirectories(parentDirectory);
         }
 
-        List<String> taskLines = new ArrayList<>();
-        for (Task task : tasks) {
-            taskLines.add(toDataLine(task));
-        }
+        List<String> taskLines = tasks.stream()
+                .map(Storage::toDataLine)
+                .toList();
         Files.write(dataFile, taskLines);
     }
 

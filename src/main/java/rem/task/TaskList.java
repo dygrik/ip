@@ -104,14 +104,10 @@ public class TaskList {
      * @return Scheduled tasks in their task-list order.
      */
     public List<Task> findTasksOn(LocalDate date) {
-        ArrayList<Task> scheduledTasks = new ArrayList<>();
-        for (Task task : tasks) {
-            if (task instanceof Deadline deadline && deadline.occursOn(date)
-                    || task instanceof Event event && event.occursOn(date)) {
-                scheduledTasks.add(task);
-            }
-        }
-        return scheduledTasks;
+        return tasks.stream()
+                .filter(task -> task instanceof Deadline deadline && deadline.occursOn(date)
+                        || task instanceof Event event && event.occursOn(date))
+                .toList();
     }
 
     /**
@@ -122,13 +118,9 @@ public class TaskList {
      */
     public List<Task> findTasks(String keyword) {
         String lowerKeyword = keyword.toLowerCase(Locale.ROOT);
-        ArrayList<Task> matchingTasks = new ArrayList<>();
-        for (Task task : tasks) {
-            if (task.getDescription().toLowerCase(Locale.ROOT).contains(lowerKeyword)) {
-                matchingTasks.add(task);
-            }
-        }
-        return matchingTasks;
+        return tasks.stream()
+                .filter(task -> task.getDescription().toLowerCase(Locale.ROOT).contains(lowerKeyword))
+                .toList();
     }
 
     /**
