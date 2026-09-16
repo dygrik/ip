@@ -39,6 +39,6 @@ public class DeleteNoteCommand extends Command {
             throws IOException, InvalidTaskNumberException, MissingNoteException {
         Task task = tasks.deleteNote(taskNumber);
         storage.saveTasks(tasks.getTasks());
-        ui.showMessages("Phew, Rem kinda forgot what the note was:", task.toString());
+        ui.showMessages("Okay. Took the note off this task:", task.toString());
     }
 }

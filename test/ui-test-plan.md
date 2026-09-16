@@ -38,21 +38,21 @@ ____________________________________________________________
 | |_) |  / _ \  | '_ ` _ \ 
 |  _ <  |  __/  | | | | | |
 |_| \_\  \___|  |_| |_| |_|
-Rem: Hello! I'm Rem!
-Rem: No more sleeping. Need help?
+Rem: Hi! I'm Rem.
+Rem: I can help! Then maybe a nap.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [T][ ] borrow book
 Rem: Yay! Our first task!
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [D][ ] return book (by: Dec 02 2019, 6:00 PM)
 Rem: Now you have 2 tasks in the list.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [E][ ] project meeting (from: Dec 03 2019, 2:00 PM to: Dec 03 2019, 4:00 PM)
 Rem: Now you have 3 tasks in the list.
 ____________________________________________________________
@@ -100,8 +100,8 @@ ____________________________________________________________
 | |_) |  / _ \  | '_ ` _ \ 
 |  _ <  |  __/  | | | | | |
 |_| \_\  \___|  |_| |_| |_|
-Rem: Hello! I'm Rem!
-Rem: No more sleeping. Need help?
+Rem: Hi! I'm Rem.
+Rem: I can help! Then maybe a nap.
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Hmm... I don't know what to do with that...
@@ -157,7 +157,7 @@ Rem: Use list to see task numbers, then use a positive number from that list.
 Rem: Example: mark 1
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [T][ ] read book
 Rem: Yay! Our first task!
 ____________________________________________________________
@@ -198,20 +198,20 @@ ____________________________________________________________
 | |_) |  / _ \  | '_ ` _ \ 
 |  _ <  |  __/  | | | | | |
 |_| \_\  \___|  |_| |_| |_|
-Rem: Hello! I'm Rem!
-Rem: No more sleeping. Need help?
+Rem: Hi! I'm Rem.
+Rem: I can help! Then maybe a nap.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [T][ ] read book
 Rem: Yay! Our first task!
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: We did it! I've marked this task as done:
+Rem: We did it! This one's done:
 Rem: [T][X] read book
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Aww ok... I've marked this task as not done yet:
+Rem: Oh! We're still doing this one. Marked it not done:
 Rem: [T][ ] read book
 ____________________________________________________________
 Me: ____________________________________________________________
@@ -246,8 +246,8 @@ ____________________________________________________________
 | |_) |  / _ \  | '_ ` _ \ 
 |  _ <  |  __/  | | | | | |
 |_| \_\  \___|  |_| |_| |_|
-Rem: Hello! I'm Rem!
-Rem: No more sleeping. Need help?
+Rem: Hi! I'm Rem.
+Rem: I can help! Then maybe a nap.
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Please give me a task number I can work with...
@@ -255,17 +255,17 @@ Rem: Use list to see task numbers, then use a positive number from that list.
 Rem: Example: mark 1
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [T][ ] first task
 Rem: Yay! Our first task!
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [T][ ] second task
 Rem: Now you have 2 tasks in the list.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: One less thing to do! Removed:
+Rem: Don't need this one? Okay. Removed:
 Rem: [T][ ] first task
 Rem: Now we are only left with 1 task in the list.
 ____________________________________________________________
@@ -274,12 +274,13 @@ Rem: Hmm... what to do now?
 Rem: 1.[T][ ] second task
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: One less thing to do! Removed:
+Rem: Don't need this one? Okay. Removed:
 Rem: [T][ ] second task
 Rem: Now we are only left with 0 tasks in the list.
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Hmm... what to do now?
+Rem: No tasks yet. Got something for us to do?
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Please give me a task number I can work with...
@@ -315,20 +316,20 @@ ____________________________________________________________
 | |_) |  / _ \  | '_ ` _ \ 
 |  _ <  |  __/  | | | | | |
 |_| \_\  \___|  |_| |_| |_|
-Rem: Hello! I'm Rem!
-Rem: No more sleeping. Need help?
+Rem: Hi! I'm Rem.
+Rem: I can help! Then maybe a nap.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [T][ ] mixed case task
 Rem: Yay! Our first task!
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: We did it! I've marked this task as done:
+Rem: We did it! This one's done:
 Rem: [T][X] mixed case task
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Aww ok... I've marked this task as not done yet:
+Rem: Oh! We're still doing this one. Marked it not done:
 Rem: [T][ ] mixed case task
 ____________________________________________________________
 Me: ____________________________________________________________
@@ -369,26 +370,26 @@ ____________________________________________________________
 | |_) |  / _ \  | '_ ` _ \ 
 |  _ <  |  __/  | | | | | |
 |_| \_\  \___|  |_| |_| |_|
-Rem: Hello! I'm Rem!
-Rem: No more sleeping. Need help?
+Rem: Hi! I'm Rem.
+Rem: I can help! Then maybe a nap.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [T][ ] read book
 Rem: Yay! Our first task!
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [D][ ] return book (by: Jun 06 2019)
 Rem: Now you have 2 tasks in the list.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [E][ ] project meeting (from: Aug 06 2019, 2:00 PM to: Aug 06 2019, 4:00 PM)
 Rem: Now you have 3 tasks in the list.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: One less thing to do! Removed:
+Rem: Don't need this one? Okay. Removed:
 Rem: [D][ ] return book (by: Jun 06 2019)
 Rem: Now we are only left with 2 tasks in the list.
 ____________________________________________________________
@@ -427,25 +428,25 @@ ____________________________________________________________
 | |_) |  / _ \  | '_ ` _ \ 
 |  _ <  |  __/  | | | | | |
 |_| \_\  \___|  |_| |_| |_|
-Rem: Hello! I'm Rem!
-Rem: No more sleeping. Need help?
+Rem: Hi! I'm Rem.
+Rem: I can help! Then maybe a nap.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [T][ ] saved task
 Rem: Yay! Our first task!
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [D][ ] removed task (by: Jun 06 2019)
 Rem: Now you have 2 tasks in the list.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: We did it! I've marked this task as done:
+Rem: We did it! This one's done:
 Rem: [T][X] saved task
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: One less thing to do! Removed:
+Rem: Don't need this one? Okay. Removed:
 Rem: [D][ ] removed task (by: Jun 06 2019)
 Rem: Now we are only left with 1 task in the list.
 ____________________________________________________________
@@ -481,8 +482,8 @@ ____________________________________________________________
 | |_) |  / _ \  | '_ ` _ \ 
 |  _ <  |  __/  | | | | | |
 |_| \_\  \___|  |_| |_| |_|
-Rem: Hello! I'm Rem!
-Rem: No more sleeping. Need help?
+Rem: Hi! I'm Rem.
+Rem: I can help! Then maybe a nap.
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Hmm... what to do now?
@@ -517,12 +518,13 @@ ____________________________________________________________
 | |_) |  / _ \  | '_ ` _ \ 
 |  _ <  |  __/  | | | | | |
 |_| \_\  \___|  |_| |_| |_|
-Rem: Hello! I'm Rem!
-Rem: No more sleeping. Need help?
-Rem: Rem found nothing... Guess I'll start a new one!
+Rem: Hi! I'm Rem.
+Rem: I can help! Then maybe a nap.
+Rem: Oh. I couldn't load your saved tasks. I'm showing an empty list.
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Hmm... what to do now?
+Rem: No tasks yet. Got something for us to do?
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: [Yawn] Need more sleep. Time for bed...
@@ -550,12 +552,12 @@ ____________________________________________________________
 | |_) |  / _ \  | '_ ` _ \ 
 |  _ <  |  __/  | | | | | |
 |_| \_\  \___|  |_| |_| |_|
-Rem: Hello! I'm Rem!
-Rem: No more sleeping. Need help?
-Rem: Rem found nothing... Guess I'll start a new one!
+Rem: Hi! I'm Rem.
+Rem: I can help! Then maybe a nap.
+Rem: Oh. I couldn't load your saved tasks. I'm showing an empty list.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Rem couldn't save the tasks... Could you check the data folder?
+Rem: Oh. Your changes weren't saved. Could you check the data folder?
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: [Yawn] Need more sleep. Time for bed...
@@ -588,21 +590,21 @@ ____________________________________________________________
 | |_) |  / _ \  | '_ ` _ \ 
 |  _ <  |  __/  | | | | | |
 |_| \_\  \___|  |_| |_| |_|
-Rem: Hello! I'm Rem!
-Rem: No more sleeping. Need help?
+Rem: Hi! I'm Rem.
+Rem: I can help! Then maybe a nap.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [T][ ] buy snacks
 Rem: Yay! Our first task!
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [D][ ] submit report (by: Dec 04 2019, 6:00 PM)
 Rem: Now you have 2 tasks in the list.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [E][ ] conference (from: Dec 03 2019, 9:00 AM to: Dec 05 2019, 5:00 PM)
 Rem: Now you have 3 tasks in the list.
 ____________________________________________________________
@@ -612,7 +614,7 @@ Rem: 1.[D][ ] submit report (by: Dec 04 2019, 6:00 PM)
 Rem: 2.[E][ ] conference (from: Dec 03 2019, 9:00 AM to: Dec 05 2019, 5:00 PM)
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: You're free on Dec 06 2019.
+Rem: Nothing scheduled on Dec 06 2019. Maybe nap time?
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Please use a date like 2019-10-15.
@@ -647,26 +649,26 @@ ____________________________________________________________
 | |_) |  / _ \  | '_ ` _ \ 
 |  _ <  |  __/  | | | | | |
 |_| \_\  \___|  |_| |_| |_|
-Rem: Hello! I'm Rem!
-Rem: No more sleeping. Need help?
+Rem: Hi! I'm Rem.
+Rem: I can help! Then maybe a nap.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [T][ ] Read Book
 Rem: Yay! Our first task!
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [D][ ] return book (by: Jun 06 2019)
 Rem: Now you have 2 tasks in the list.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [E][ ] library visit (from: Jun 07 2019, 2:00 PM to: Jun 07 2019, 4:00 PM)
 Rem: Now you have 3 tasks in the list.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Here are the matching tasks in your list:
+Rem: Found these!
 Rem: 1.[T][ ] Read Book
 Rem: 2.[D][ ] return book (by: Jun 06 2019)
 ____________________________________________________________
@@ -712,42 +714,42 @@ ____________________________________________________________
 | |_) |  / _ \  | '_ ` _ \ 
 |  _ <  |  __/  | | | | | |
 |_| \_\  \___|  |_| |_| |_|
-Rem: Hello! I'm Rem!
-Rem: No more sleeping. Need help?
+Rem: Hi! I'm Rem.
+Rem: I can help! Then maybe a nap.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [T][ ] read book
 Rem:   Note: Borrow it from Alice
 Rem: Yay! Our first task!
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [D][ ] submit report (by: Oct 01 2026, 6:00 PM)
 Rem:   Note: Include appendix
 Rem: Now you have 2 tasks in the list.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Hmm... Rem will try his best to remember:
+Rem: I'll keep this note with your task:
 Rem: [D][ ] submit report (by: Oct 01 2026, 6:00 PM)
 Rem:   Note: Include the references
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Here are the matching tasks in your list:
+Rem: Found these!
 Rem: 1.[D][ ] submit report (by: Oct 01 2026, 6:00 PM)
 Rem:   Note: Include the references
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: We did it! I've marked this task as done:
+Rem: We did it! This one's done:
 Rem: [T][X] read book
 Rem:   Note: Borrow it from Alice
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Phew, Rem kinda forgot what the note was:
+Rem: Okay. Took the note off this task:
 Rem: [D][ ] submit report (by: Oct 01 2026, 6:00 PM)
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: You didn't give Rem anything to remember though...
+Rem: This task doesn't have a note to remove.
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Hmm... what to do now?
@@ -784,23 +786,81 @@ ____________________________________________________________
 | |_) |  / _ \  | '_ ` _ \ 
 |  _ <  |  __/  | | | | | |
 |_| \_\  \___|  |_| |_| |_|
-Rem: Hello! I'm Rem!
-Rem: No more sleeping. Need help?
+Rem: Hi! I'm Rem.
+Rem: I can help! Then maybe a nap.
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: Ok! I've added this:
+Rem: Got it! I put it on the list:
 Rem: [T][ ] read book
 Rem: Yay! Our first task!
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: You didn't say what Rem should remember...
+Rem: What should I keep in this note?
 ____________________________________________________________
 Me: ____________________________________________________________
-Rem: You didn't say what Rem should remember...
+Rem: What should I keep in this note?
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Hmm... what to do now?
 Rem: 1.[T][ ] read book
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: [Yawn] Need more sleep. Time for bed...
+____________________________________________________________
+```
+
+## TC-15: Explain empty lists and unsuccessful searches
+
+**Aim:** Verify empty-state dialogue before adding and after deleting a task, and distinguish empty searches from matches.
+
+**Inputs:**
+
+```text
+list
+find pillow
+todo wash pillow
+find pillow
+delete 1
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____                      
+|  _ \    ___    _ __ ___  
+| |_) |  / _ \  | '_ ` _ \ 
+|  _ <  |  __/  | | | | | |
+|_| \_\  \___|  |_| |_| |_|
+Rem: Hi! I'm Rem.
+Rem: I can help! Then maybe a nap.
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: Hmm... what to do now?
+Rem: No tasks yet. Got something for us to do?
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: Didn't find any tasks matching 'pillow'. Try another word?
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: Got it! I put it on the list:
+Rem: [T][ ] wash pillow
+Rem: Yay! Our first task!
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: Found these!
+Rem: 1.[T][ ] wash pillow
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: Don't need this one? Okay. Removed:
+Rem: [T][ ] wash pillow
+Rem: Now we are only left with 0 tasks in the list.
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: Hmm... what to do now?
+Rem: No tasks yet. Got something for us to do?
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: [Yawn] Need more sleep. Time for bed...
@@ -816,7 +876,10 @@ on the JavaFX thread and submits real commands through Send and Enter. It checks
 - Blank submissions add no messages and disable Send.
 - Invalid commands retain the input and display an error heading, accessible error text,
   and a contrasting error background. A subsequent valid command returns to normal styling.
-- The single 40 px header portrait loads correctly.
+- The single 40 px header portrait loads correctly. After 45 seconds idle it dims with a zZ indicator.
+- Typing, key presses, clicks, or scrolling wake the portrait immediately; exit stops the idle timer.
+- A vector helper appears only while the task list is empty, including after deleting the last task.
+- Short replies use compact bubbles; multiline lists and help retain wide cards.
 - Replies and the composer fit narrow and wide windows.
 - Submissions scroll to the latest reply; resizing preserves the reader's scroll position.
 - Up/Down recall submitted commands without submitting and restore the unfinished draft.
@@ -825,7 +888,7 @@ on the JavaFX thread and submits real commands through Send and Enter. It checks
 
 The console cases above include the new command syntax and recovery hints shared with the GUI.
 Launch the GUI with `gradlew run` or `java -jar build/libs/rem.jar` after `gradlew shadowJar`.
-The full-window artwork remains fixed behind a strongly dimmed conversation viewport.
+The artwork is anchored at the bottom right behind a lightly dimmed viewport; message cards stay opaque.
 Rem's circular portrait appears only in the header; commands have no avatar.
 Verify long task lists and notes remain readable at 380 x 400 and 800 x 600.
 Errors have a red-tinted card, contrasting border, and a visible warning symbol and Error heading.

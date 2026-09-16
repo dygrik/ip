@@ -18,6 +18,9 @@ public class ListCommand extends Command {
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         ui.showMessage("Hmm... what to do now?");
+        if (tasks.size() == 0) {
+            ui.showMessage("No tasks yet. Got something for us to do?");
+        }
         ui.showNumberedTasks(tasks.getTasks());
     }
 }

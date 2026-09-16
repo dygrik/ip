@@ -29,7 +29,7 @@ public class RemTest {
     public void getResponse_addMarkReload_collectsLinesAndPersists() {
         String path = directory.resolve("rem.txt").toString();
         Rem rem = new Rem(path);
-        assertEquals("Ok! I've added this:\n[T][ ] read book\nYay! Our first task!",
+        assertEquals("Got it! I put it on the list:\n[T][ ] read book\nYay! Our first task!",
                 rem.getResponse("todo read book").text());
         rem.getResponse("mark 1");
         assertEquals("Hmm... what to do now?\n1.[T][X] read book",
@@ -37,7 +37,8 @@ public class RemTest {
         rem.getResponse("unmark 1");
         assertTrue(rem.getResponse("find book").text().contains("[T][ ] read book"));
         rem.getResponse("delete 1");
-        assertEquals("Hmm... what to do now?", new Rem(path).getResponse("list").text());
+        assertEquals("Hmm... what to do now?\nNo tasks yet. Got something for us to do?",
+                new Rem(path).getResponse("list").text());
     }
 
     @Test
@@ -50,7 +51,8 @@ public class RemTest {
         assertTrue(rem.getResponse("mark 1").isError());
         assertFalse(rem.getResponse("list").isError());
         assertEquals("You didn't say what you wanna do...", rem.getResponse("todo").text());
-        assertEquals("Hmm... what to do now?", rem.getResponse("list").text());
+        assertEquals("Hmm... what to do now?\nNo tasks yet. Got something for us to do?",
+                rem.getResponse("list").text());
         Response farewell = rem.getResponse("BYE");
         assertTrue(farewell.isExit());
         assertFalse(farewell.isError());
@@ -63,13 +65,13 @@ public class RemTest {
         Rem rem = new Rem(path);
         rem.getResponse("todo read book /note Borrow it from Alice");
 
-        assertEquals("Hmm... Rem will try his best to remember:\n"
+        assertEquals("I'll keep this note with your task:\n"
                 + "[T][ ] read book\n  Note: Return it tomorrow",
                 rem.getResponse("note 1 Return it tomorrow").text());
         assertTrue(rem.getResponse("find TOMORROW").text().contains("Note: Return it tomorrow"));
-        assertEquals("Phew, Rem kinda forgot what the note was:\n[T][ ] read book",
+        assertEquals("Okay. Took the note off this task:\n[T][ ] read book",
                 rem.getResponse("deletenote 1").text());
-        assertEquals("You didn't give Rem anything to remember though...",
+        assertEquals("This task doesn't have a note to remove.",
                 rem.getResponse("deletenote 1").text());
         assertFalse(new Rem(path).getResponse("list").text().contains("Note:"));
     }
@@ -79,7 +81,7 @@ public class RemTest {
         Rem rem = new Rem(directory.resolve("rem.txt").toString());
         rem.getResponse("todo read book");
 
-        assertEquals("You didn't say what Rem should remember...",
+        assertEquals("What should I keep in this note?",
                 rem.getResponse("note 1").text());
         assertEquals("Rem can't remember more than 200 characters...",
                 rem.getResponse("note 1 " + "a".repeat(201)).text());
@@ -87,12 +89,27 @@ public class RemTest {
     }
 
     @Test
+    public void getResponse_emptySearchAndSchedule_reportsAbsenceWithoutInventingAvailability() {
+        Rem rem = new Rem(directory.resolve("rem.txt").toString());
+        assertFalse(rem.hasTasks());
+        assertEquals("Didn't find any tasks matching 'pillow'. Try another word?",
+                rem.getResponse("find pillow").text());
+        rem.getResponse("todo wash pillow");
+        assertTrue(rem.hasTasks());
+        assertEquals("Found these!\n1.[T][ ] wash pillow", rem.getResponse("find pillow").text());
+        assertEquals("Nothing scheduled on Oct 01 2026. Maybe nap time?",
+                rem.getResponse("on 2026-10-01").text());
+        rem.getResponse("delete 1");
+        assertFalse(rem.hasTasks());
+    }
+
+    @Test
     public void getResponse_storageFailure_reportsError() throws IOException {
         Path blocked = Files.createDirectory(directory.resolve("blocked"));
         Rem rem = new Rem(blocked.toString());
-        assertTrue(rem.getWelcome().contains("Rem found nothing"));
+        assertTrue(rem.getWelcome().contains("I couldn't load your saved tasks"));
         Response failure = rem.getResponse("todo read book");
-        assertEquals("Rem couldn't save the tasks... Could you check the data folder?", failure.text());
+        assertEquals("Oh. Your changes weren't saved. Could you check the data folder?", failure.text());
         assertTrue(failure.isError());
         assertFalse(failure.isExit());
     }

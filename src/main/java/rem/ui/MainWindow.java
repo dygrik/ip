@@ -4,11 +4,16 @@ import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 import rem.Rem;
@@ -20,6 +25,15 @@ import rem.Response;
 public class MainWindow {
     private static final double SCROLL_SPEED_MULTIPLIER = 1.5;
     private final CommandHistory history = new CommandHistory();
+    private final PauseTransition idleTimer = new PauseTransition(Duration.seconds(45));
+    @FXML
+    private BorderPane window;
+    @FXML
+    private ImageView portrait;
+    @FXML
+    private Label sleepIndicator;
+    @FXML
+    private HBox emptyState;
     @FXML
     private TextField userInput;
     @FXML
@@ -38,6 +52,34 @@ public class MainWindow {
         sendButton.setDisable(true);
         userInput.addEventFilter(KeyEvent.KEY_PRESSED, this::handleHistoryKey);
         scrollPane.addEventFilter(ScrollEvent.SCROLL, this::handleScroll);
+        idleTimer.setOnFinished(event -> showSleepingPortrait());
+        window.addEventFilter(KeyEvent.KEY_PRESSED, event -> wakePortrait());
+        window.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> wakePortrait());
+        window.addEventFilter(ScrollEvent.SCROLL, event -> wakePortrait());
+        userInput.textProperty().addListener((observable, oldValue, newValue) -> wakePortrait());
+    }
+
+    /** Shows a quiet idle state without blocking the task manager. */
+    private void showSleepingPortrait() {
+        portrait.setOpacity(0.4);
+        portrait.setAccessibleText("Rem is napping");
+        sleepIndicator.setVisible(true);
+    }
+
+    /** Restores the portrait immediately and restarts the inactivity timer. */
+    private void wakePortrait() {
+        portrait.setOpacity(1.0);
+        portrait.setAccessibleText("Rem is awake and ready to help");
+        sleepIndicator.setVisible(false);
+        if (!userInput.isDisabled()) {
+            idleTimer.playFromStart();
+        }
+    }
+
+    /** Keeps the helper illustration in sync with the current task list. */
+    private void updateEmptyState() {
+        emptyState.setVisible(!rem.hasTasks());
+        emptyState.setManaged(!rem.hasTasks());
     }
 
     /**
@@ -83,6 +125,8 @@ public class MainWindow {
     public void setRem(Rem rem) {
         this.rem = rem;
         dialogContainer.getChildren().add(new DialogBox(rem.getWelcome(), false));
+        updateEmptyState();
+        wakePortrait();
     }
 
     @FXML
@@ -97,6 +141,7 @@ public class MainWindow {
         history.add(input);
         dialogContainer.getChildren().add(new DialogBox(input, true));
         Response response = rem.getResponse(input);
+        updateEmptyState();
         dialogContainer.getChildren().add(new DialogBox(response.text(), false, response.isError()));
         if (!response.isError()) {
             userInput.clear();
@@ -107,6 +152,8 @@ public class MainWindow {
         scrollPane.setVvalue(1.0);
         userInput.requestFocus();
         if (response.isExit()) {
+            idleTimer.stop();
+            showSleepingPortrait();
             userInput.setDisable(true);
             sendButton.setDisable(true);
             // Let the user read the farewell before closing the window.
