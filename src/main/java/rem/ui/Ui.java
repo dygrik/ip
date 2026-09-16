@@ -20,6 +20,7 @@ public class Ui implements AutoCloseable {
 
     private final Scanner scanner;
     private final Consumer<String> output;
+    private boolean hasError;
 
     /**
      * Creates a UI that reads from standard input.
@@ -78,6 +79,20 @@ public class Ui implements AutoCloseable {
      */
     public void showMessage(String message) {
         output.accept(message);
+    }
+
+    /**
+     * Reports an error while preserving the console's existing message format.
+     *
+     * @param message Explanation of the failure.
+     */
+    public void showError(String message) {
+        hasError = true;
+        showMessage(message);
+    }
+
+    public boolean hasError() {
+        return hasError;
     }
 
     /**

@@ -5,44 +5,68 @@ import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.shape.Circle;
+import javafx.scene.layout.VBox;
 
 /**
- * Displays a wrapping message beside the speaker's circular profile picture.
+ * Displays a compact user command or a wider application response with an optional error heading.
  */
 public class DialogBox extends HBox {
-    private static final int DIALOG_WIDTH_OFFSET = 90;
-    private static final int AVATAR_SIZE = 48;
-    private static final double AVATAR_RADIUS = AVATAR_SIZE / 2.0;
-    private static final Image REM_IMAGE =
-            new Image(DialogBox.class.getResource("/images/rem.jpeg").toExternalForm());
-    private static final Image USER_IMAGE =
-            new Image(DialogBox.class.getResource("/images/hidden_king.jpg").toExternalForm());
+    private final double messageWidthRatio;
     @FXML
     private Label dialog;
     @FXML
-    private StackPane avatar;
+    private Label errorHeading;
+    @FXML
+    private VBox message;
 
     /**
-     * Creates one message, aligned according to its speaker.
+     * Creates a normal message aligned according to its speaker.
      *
      * @param text Message text.
      * @param isUser Whether this message belongs to the user.
      */
     public DialogBox(String text, boolean isUser) {
+        this(text, isUser, false);
+    }
+
+    /**
+     * Creates a message with a visible, accessible heading when an application error occurs.
+     *
+     * @param text Message text.
+     * @param isUser Whether this message belongs to the user.
+     * @param isError Whether the application response describes a failure.
+     */
+    public DialogBox(String text, boolean isUser, boolean isError) {
+        messageWidthRatio = isUser ? 0.85 : 0.94;
         loadView();
         dialog.setText(text);
-        dialog.maxWidthProperty().bind(widthProperty().subtract(DIALOG_WIDTH_OFFSET));
+        errorHeading.setVisible(isError);
+        errorHeading.setManaged(isError);
+        message.maxWidthProperty().bind(widthProperty().multiply(messageWidthRatio));
+        if (isUser) {
+            setAlignment(Pos.TOP_RIGHT);
+            message.getStyleClass().add("user-message");
+            message.setAccessibleText("You: " + text);
+        } else {
+            message.prefWidthProperty().bind(widthProperty().multiply(messageWidthRatio));
+            message.setAccessibleText((isError ? "Error: " : "RemBot: ") + text);
+        }
+        if (isError) {
+            message.getStyleClass().add("error-message");
+        }
+    }
 
-        Image profile = isUser ? USER_IMAGE : REM_IMAGE;
-        avatar.getChildren().add(createProfilePicture(profile));
-        configureSpeaker(isUser);
+    @Override
+    protected double computePrefHeight(double width) {
+        // Use the proposed width during resizing, before the width binding has been updated.
+        return width < 0 ? super.computePrefHeight(width) : message.prefHeight(width * messageWidthRatio);
+    }
+
+    @Override
+    protected double computeMinHeight(double width) {
+        return computePrefHeight(width);
     }
 
     private void loadView() {
@@ -52,31 +76,7 @@ public class DialogBox extends HBox {
         try {
             loader.load();
         } catch (IOException e) {
-            throw new IllegalStateException("Unable to load chat bubble", e);
-        }
-    }
-
-    private static ImageView createProfilePicture(Image profile) {
-        ImageView picture = new ImageView(profile);
-        // Crop the center to a square so landscape profile pictures are not stretched.
-        double side = Math.min(profile.getWidth(), profile.getHeight());
-        double cropX = (profile.getWidth() - side) / 2;
-        double cropY = (profile.getHeight() - side) / 2;
-        picture.setViewport(new Rectangle2D(cropX, cropY, side, side));
-        picture.setFitWidth(AVATAR_SIZE);
-        picture.setFitHeight(AVATAR_SIZE);
-        picture.setClip(new Circle(AVATAR_RADIUS, AVATAR_RADIUS, AVATAR_RADIUS));
-        return picture;
-    }
-
-    private void configureSpeaker(boolean isUser) {
-        if (isUser) {
-            avatar.setAccessibleText("You");
-            getChildren().setAll(dialog, avatar);
-            setAlignment(Pos.TOP_RIGHT);
-            dialog.getStyleClass().add("user-message");
-        } else {
-            avatar.setAccessibleText("RemBot");
+            throw new IllegalStateException("Unable to load chat message", e);
         }
     }
 }

@@ -73,7 +73,7 @@ public class Rem {
      * Processes one graphical input using the same commands as the console.
      *
      * @param input User command.
-     * @return Collected response and whether the conversation should end.
+     * @return Collected response, whether it is an error, and whether the conversation should end.
      */
     public Response getResponse(String input) {
         StringBuilder messages = new StringBuilder();
@@ -84,7 +84,7 @@ public class Rem {
             messages.append(message);
         });
         boolean isExit = execute(input, responseUi);
-        return new Response(messages.toString(), isExit);
+        return new Response(messages.toString(), isExit, responseUi.hasError());
     }
 
     /**
@@ -96,9 +96,9 @@ public class Rem {
             command.execute(tasks, targetUi, storage);
             return command.isExit();
         } catch (RemException e) {
-            targetUi.showMessage(e.getMessage());
+            targetUi.showError(e.getMessage());
         } catch (IOException e) {
-            targetUi.showMessage("Rem couldn't save the tasks... Could you check the data folder?");
+            targetUi.showError("Rem couldn't save the tasks... Could you check the data folder?");
         }
         return false;
     }
