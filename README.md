@@ -12,6 +12,12 @@ in the GUI, including `todo`, `deadline`, `event`, `list`, `mark`, `unmark`,
 with `/note`, or use `note TASK_NUMBER NOTE` afterward. See the
 [user guide](docs/README.md) for examples. The farewell stays visible briefly before closing.
 
+The GUI keeps the artwork behind a dimmed conversation area. User commands appear as compact
+right-aligned bubbles, while Rem's replies use wider cards. Errors have a contrasting border
+and an Error heading, and the command stays in the input for correction. Blank submissions
+are ignored. Resize the window to suit your screen; reading older messages is not interrupted
+by resizing, and submitting a command scrolls to its reply.
+
 Build the runnable JAR with `.\gradlew.bat shadowJar`, then run
 `java -jar build/libs/rem.jar`. The bundled JavaFX natives target Windows, macOS,
 and Linux x64, matching the tutorial setup. Other architectures need matching JavaFX natives.

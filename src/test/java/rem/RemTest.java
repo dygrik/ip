@@ -33,11 +33,17 @@ public class RemTest {
     @Test
     public void getResponse_invalidThenValid_doesNotLeakMessages() {
         Rem rem = new Rem(directory.resolve("rem.txt").toString());
-        assertFalse(rem.getResponse("invalid").isExit());
+        Response invalid = rem.getResponse("invalid");
+        assertFalse(invalid.isExit());
+        assertTrue(invalid.isError());
+        assertTrue(rem.getResponse("todo").isError());
+        assertTrue(rem.getResponse("mark 1").isError());
+        assertFalse(rem.getResponse("list").isError());
         assertEquals("You didn't say what you wanna do...", rem.getResponse("todo").text());
         assertEquals("Hmm... what to do now?", rem.getResponse("list").text());
         Response farewell = rem.getResponse("BYE");
         assertTrue(farewell.isExit());
+        assertFalse(farewell.isError());
         assertEquals("[Yawn] Need more sleep. Time for bed...", farewell.text());
     }
 
@@ -75,7 +81,9 @@ public class RemTest {
         Path blocked = Files.createDirectory(directory.resolve("blocked"));
         Rem rem = new Rem(blocked.toString());
         assertTrue(rem.getWelcome().contains("Rem found nothing"));
-        assertEquals("Rem couldn't save the tasks... Could you check the data folder?",
-                rem.getResponse("todo read book").text());
+        Response failure = rem.getResponse("todo read book");
+        assertEquals("Rem couldn't save the tasks... Could you check the data folder?", failure.text());
+        assertTrue(failure.isError());
+        assertFalse(failure.isExit());
     }
 }

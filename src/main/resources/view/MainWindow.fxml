@@ -1,23 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.shape.Circle?>
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="rem.ui.MainWindow" prefWidth="560" prefHeight="720"
             stylesheets="@../css/main.css">
     <top>
-        <VBox styleClass="header" spacing="5">
-            <Label text="RemBot" styleClass="title"/>
-            <Label text="A little help, then back to sleep..." styleClass="subtitle"/>
-        </VBox>
+        <HBox styleClass="header" spacing="12" alignment="CENTER_LEFT">
+            <ImageView fitWidth="40" fitHeight="40" accessibleText="RemBot portrait">
+                <image><Image url="@../images/rem.jpeg"/></image>
+                <clip><Circle centerX="20" centerY="20" radius="20"/></clip>
+            </ImageView>
+            <VBox spacing="2">
+                <Label text="RemBot" styleClass="title"/>
+                <Label text="A little help, then back to sleep..." styleClass="subtitle" wrapText="true"/>
+            </VBox>
+        </HBox>
     </top>
     <center>
         <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER">
-            <content><VBox fx:id="dialogContainer" spacing="18" styleClass="conversation"/></content>
+            <content><VBox fx:id="dialogContainer" spacing="12" styleClass="conversation"/></content>
         </ScrollPane>
     </center>
     <bottom>
         <VBox spacing="8" styleClass="composer">
-            <Label text="Try: todo read book · list · find book · bye" styleClass="subtitle"/>
+            <Label text="Try: todo read book · list · find book · bye" styleClass="subtitle" wrapText="true"/>
             <HBox spacing="10">
                 <TextField fx:id="userInput" promptText="Tell Rem what to do…"
                            HBox.hgrow="ALWAYS" onAction="#handleUserInput"/>

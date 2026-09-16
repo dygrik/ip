@@ -27,8 +27,10 @@ public class MainWindow {
 
     @FXML
     private void initialize() {
-        dialogContainer.heightProperty().addListener((observable, oldValue, newValue) ->
-                scrollPane.setVvalue(1.0));
+        // Resizing should not interrupt reading older messages.
+        userInput.textProperty().addListener((observable, oldValue, newValue) ->
+                sendButton.setDisable(newValue.isBlank()));
+        sendButton.setDisable(true);
     }
 
     /**
@@ -47,10 +49,19 @@ public class MainWindow {
             return;
         }
         String input = userInput.getText();
+        if (input.isBlank()) {
+            return;
+        }
         dialogContainer.getChildren().add(new DialogBox(input, true));
         Response response = rem.getResponse(input);
-        dialogContainer.getChildren().add(new DialogBox(response.text(), false));
-        userInput.clear();
+        dialogContainer.getChildren().add(new DialogBox(response.text(), false, response.isError()));
+        if (!response.isError()) {
+            userInput.clear();
+        }
+        // Apply the new message heights before moving to the latest response.
+        scrollPane.applyCss();
+        scrollPane.layout();
+        scrollPane.setVvalue(1.0);
         userInput.requestFocus();
         if (response.isExit()) {
             userInput.setDisable(true);

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 <fx:root type="HBox" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-         alignment="TOP_LEFT" spacing="12">
-    <StackPane fx:id="avatar" minWidth="48" maxWidth="48" minHeight="48" maxHeight="48"/>
-    <Label fx:id="dialog" wrapText="true" minWidth="0" styleClass="message"/>
+         alignment="TOP_LEFT" minWidth="0">
+    <VBox fx:id="message" minWidth="0" styleClass="message" spacing="5">
+        <Label fx:id="errorHeading" text="&#9888; Error" styleClass="error-heading" wrapText="true"/>
+        <Label fx:id="dialog" wrapText="true" minWidth="0" maxWidth="Infinity"/>
+    </VBox>
 </fx:root>
