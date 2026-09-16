@@ -19,6 +19,7 @@ public class RemTest {
     @Test
     public void getResponse_invalidCommands_providesActionableExamples() {
         Rem rem = new Rem(directory.resolve("rem.txt").toString());
+        assertEquals("Hi! I'm Rem.\nI can help! Then maybe a nap.", rem.getWelcome());
         assertTrue(rem.getResponse("todos").text().contains("Try todo read book"));
         assertTrue(rem.getResponse("deadline report").text().contains("/by YYYY-MM-DD [HHmm]"));
         assertTrue(rem.getResponse("event meeting").text().contains("The end must be after the start."));
@@ -102,6 +103,20 @@ public class RemTest {
                 rem.getResponse("on 2026-10-01").text());
         rem.getResponse("delete 1");
         assertFalse(rem.hasTasks());
+    }
+
+    @Test
+    public void getResponse_scheduledTasksOnDate_returnsMatchingTasksInOrder() {
+        Rem rem = new Rem(directory.resolve("rem.txt").toString());
+        rem.getResponse("todo buy snacks");
+        rem.getResponse("deadline submit report /by 2026-10-01 1800");
+        rem.getResponse("event conference /from 2026-09-30 0900 /to 2026-10-02 1700");
+        rem.getResponse("deadline later /by 2026-10-03");
+
+        assertEquals("Here's what's scheduled on Oct 01 2026:\n"
+                + "1.[D][ ] submit report (by: Oct 01 2026, 6:00 PM)\n"
+                + "2.[E][ ] conference (from: Sep 30 2026, 9:00 AM to: Oct 02 2026, 5:00 PM)",
+                rem.getResponse("on 2026-10-01").text());
     }
 
     @Test

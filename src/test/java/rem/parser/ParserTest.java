@@ -12,9 +12,17 @@ import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 
+import rem.command.AddCommand;
 import rem.command.CommandType;
+import rem.command.DeleteCommand;
 import rem.command.DeleteNoteCommand;
+import rem.command.ExitCommand;
+import rem.command.FindCommand;
+import rem.command.ListCommand;
+import rem.command.MarkCommand;
 import rem.command.NoteCommand;
+import rem.command.OnCommand;
+import rem.command.UnmarkCommand;
 import rem.exception.EmptyDescriptionException;
 import rem.exception.EmptyNoteException;
 import rem.exception.InvalidDateException;
@@ -23,6 +31,7 @@ import rem.exception.InvalidEventFormatException;
 import rem.exception.InvalidTaskNumberException;
 import rem.exception.NoteTooLongException;
 import rem.exception.RemException;
+import rem.exception.UnknownCommandException;
 import rem.task.Deadline;
 import rem.task.Event;
 import rem.task.Task;
@@ -32,6 +41,47 @@ import rem.task.Todo;
  * Tests command argument validation and task construction by {@link Parser}.
  */
 public class ParserTest {
+    @Test
+    public void parse_allCommandTypes_expectedCommandClassesReturned() throws RemException {
+        assertInstanceOf(ExitCommand.class, Parser.parse("bye"));
+        assertInstanceOf(ListCommand.class, Parser.parse("list"));
+        assertInstanceOf(FindCommand.class, Parser.parse("find book"));
+        assertInstanceOf(OnCommand.class, Parser.parse("on 2026-10-01"));
+        assertInstanceOf(MarkCommand.class, Parser.parse("mark 1"));
+        assertInstanceOf(UnmarkCommand.class, Parser.parse("unmark 1"));
+        assertInstanceOf(DeleteCommand.class, Parser.parse("delete 1"));
+        assertInstanceOf(NoteCommand.class, Parser.parse("note 1 remember"));
+        assertInstanceOf(DeleteNoteCommand.class, Parser.parse("deletenote 1"));
+        assertInstanceOf(AddCommand.class, Parser.parse("todo read"));
+        assertInstanceOf(AddCommand.class, Parser.parse("deadline submit /by 2026-10-01"));
+        assertInstanceOf(AddCommand.class,
+                Parser.parse("event meet /from 2026-10-01 /to 2026-10-02"));
+    }
+
+    @Test
+    public void parse_nullBlankUnknownOrExtraArguments_exceptionThrown() {
+        assertThrows(UnknownCommandException.class, () -> Parser.parse(null));
+        assertThrows(UnknownCommandException.class, () -> Parser.parse("   "));
+        assertThrows(UnknownCommandException.class, () -> Parser.parse("unknown"));
+        RemException listException = assertThrows(RemException.class, () ->
+                Parser.parse("list extra"));
+        RemException byeException = assertThrows(RemException.class, () ->
+                Parser.parse("bye later"));
+
+        assertEquals("list does not take arguments.", listException.getMessage());
+        assertEquals("bye does not take arguments.", byeException.getMessage());
+    }
+
+    @Test
+    public void parse_multilineOrControlInput_exceptionThrown() {
+        for (String input : List.of("todo a\nb", "todo a\rb", "todo a\u0000b",
+                "todo a\u2028b", "todo a\u2029b")) {
+            RemException exception = assertThrows(RemException.class, () ->
+                    Parser.parse(input), input);
+            assertEquals("Use a single line without control characters.", exception.getMessage());
+        }
+    }
+
     @Test
     public void getCommandType_mixedCaseKnownCommand_commandTypeReturned() {
         assertEquals(CommandType.DEADLINE, Parser.getCommandType("DeAdLiNe submit report"));
@@ -124,6 +174,14 @@ public class ParserTest {
     }
 
     @Test
+    public void noteParsing_missingOrInvalidTaskNumber_exceptionThrown() {
+        for (String input : List.of("note", "note abc text", "note 0 text", "note -1 text",
+                "note 999999999999999999 text")) {
+            assertThrows(InvalidTaskNumberException.class, () -> Parser.parse(input), input);
+        }
+    }
+
+    @Test
     public void noteParsing_missingOrTooLongNote_exceptionThrown() {
         String longNote = "a".repeat(201);
 
@@ -146,10 +204,20 @@ public class ParserTest {
     @Test
     public void createTask_noteLikeText_keptInDescription()
             throws RemException {
-        Task task = Parser.createTask("todo review /noteworthy examples");
+        Task task = Parser.createTask("todo review /noteworthy examples /noteish text");
 
-        assertEquals("review /noteworthy examples", task.getDescription());
+        assertEquals("review /noteworthy examples /noteish text", task.getDescription());
         assertFalse(task.hasNote());
+    }
+
+    @Test
+    public void createTask_noteFieldIsCaseInsensitiveAndMustBeStandalone() throws RemException {
+        Task notedTask = Parser.createTask("todo read /NoTe remember");
+        Task slashWithoutWhitespace = Parser.createTask("todo read/note remember");
+
+        assertEquals("remember", notedTask.getNote());
+        assertEquals("read/note remember", slashWithoutWhitespace.getDescription());
+        assertFalse(slashWithoutWhitespace.hasNote());
     }
 
     @Test
@@ -174,6 +242,8 @@ public class ParserTest {
     @Test
     public void createTask_emptyDescriptions_exceptionThrown() {
         assertThrows(EmptyDescriptionException.class, () -> Parser.createTask("todo"));
+        assertThrows(EmptyDescriptionException.class, () -> Parser.createTask("deadline"));
+        assertThrows(EmptyDescriptionException.class, () -> Parser.createTask("event"));
         assertThrows(EmptyDescriptionException.class, () ->
                 Parser.createTask("deadline /by 2026-08-29"));
         assertThrows(EmptyDescriptionException.class, () ->

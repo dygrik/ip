@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -80,6 +81,17 @@ public class StorageTest {
     }
 
     @Test
+    public void saveTasks_emptyList_existingContentsRemoved() throws IOException {
+        Path dataFile = temporaryDirectory.resolve("tasks.txt");
+        Storage storage = new Storage(dataFile.toString());
+        storage.saveTasks(List.of(new Todo("old")));
+
+        storage.saveTasks(List.of());
+
+        assertTrue(Files.readAllLines(dataFile).isEmpty());
+    }
+
+    @Test
     public void loadTasks_blankLines_blankLinesIgnored() throws IOException {
         Path dataFile = temporaryDirectory.resolve("tasks.txt");
         Files.writeString(dataFile, "\nT | 0 | read book\n\n");
@@ -114,6 +126,26 @@ public class StorageTest {
     }
 
     @Test
+    public void loadTasks_structurallyInvalidRecords_exceptionThrown() throws IOException {
+        Path dataFile = temporaryDirectory.resolve("tasks.txt");
+        for (String line : List.of(
+                "T",
+                "T2 | 0",
+                "T | 0",
+                "T | 0 | ",
+                "T | 0 | task | extra | excess",
+                "D | 0 | task | ",
+                "E | 0 | task | invalid | 2026-10-02")) {
+            Files.writeString(dataFile, line);
+
+            IOException exception = assertThrows(IOException.class, () ->
+                    new Storage(dataFile.toString()).loadTasks(), line);
+
+            assertEquals("Invalid task data on line 1.", exception.getMessage(), line);
+        }
+    }
+
+    @Test
     public void loadTasks_oldFormat_tasksHaveNoNotes() throws IOException {
         Path dataFile = temporaryDirectory.resolve("old.txt");
         Files.writeString(dataFile, "T | 0 | old task\n");
@@ -135,6 +167,38 @@ public class StorageTest {
         assertThrows(IOException.class, () ->
                 new Storage(invalidBase64File.toString()).loadTasks());
         assertThrows(IOException.class, () -> new Storage(tooLongFile.toString()).loadTasks());
+    }
+
+    @Test
+    public void loadTasks_nonCanonicalOrInvalidUtf8Base64_exceptionThrown() throws IOException {
+        Path dataFile = temporaryDirectory.resolve("tasks.txt");
+        String invalidUtf8 = Base64.getEncoder().encodeToString(new byte[]{(byte) 0xc3, 0x28});
+        for (String line : List.of(
+                "T2 | 0 | YQ",
+                "T2 | 0 | " + invalidUtf8,
+                "T | 0 | task | N:YQ",
+                "T | 0 | task | N:" + invalidUtf8)) {
+            Files.writeString(dataFile, line);
+
+            assertThrows(IOException.class, () ->
+                    new Storage(dataFile.toString()).loadTasks(), line);
+        }
+    }
+
+    @Test
+    public void loadTasks_invalidOptionalNotes_exceptionThrown() throws IOException {
+        Path dataFile = temporaryDirectory.resolve("tasks.txt");
+        for (String note : List.of("", " note", "note ", "two\nlines", "two\rlines",
+                "two\u2028lines", "two\u2029lines")) {
+            String encodedNote = Base64.getEncoder().encodeToString(
+                    note.getBytes(StandardCharsets.UTF_8));
+            Files.writeString(dataFile, "T | 0 | task | N:" + encodedNote);
+
+            assertThrows(IOException.class, () ->
+                    new Storage(dataFile.toString()).loadTasks(), note);
+        }
+        Files.writeString(dataFile, "T | 0 | task | not-a-note");
+        assertThrows(IOException.class, () -> new Storage(dataFile.toString()).loadTasks());
     }
 
     @Test
@@ -168,6 +232,46 @@ public class StorageTest {
             assertThrows(IOException.class, () -> storage.saveTasks(List.of(new Todo("new"))), line);
             assertEquals(line, Files.readString(file));
         }
+    }
+
+    @Test
+    public void loadTasks_failureThenSuccessfulReload_savingEnabledAgain() throws IOException {
+        Path file = temporaryDirectory.resolve("tasks.txt");
+        Storage storage = new Storage(file.toString());
+        Files.writeString(file, "invalid");
+        assertThrows(IOException.class, storage::loadTasks);
+
+        Files.writeString(file, "T | 0 | repaired\n");
+        assertEquals("repaired", storage.loadTasks().get(0).getDescription());
+
+        storage.saveTasks(List.of(new Todo("new")));
+        assertEquals(List.of("T | 0 | new"), Files.readAllLines(file));
+    }
+
+    @Test
+    public void loadTasks_dataPathIsDirectory_actionableExceptionThrown() throws IOException {
+        Path dataDirectory = Files.createDirectory(temporaryDirectory.resolve("tasks.txt"));
+
+        IOException exception = assertThrows(IOException.class, () ->
+                new Storage(dataDirectory.toString()).loadTasks());
+
+        assertEquals("The saved task path is a directory. Choose a regular file and restart Rem.",
+                exception.getMessage());
+    }
+
+    @Test
+    public void saveTasks_destinationIsNonemptyDirectory_temporaryFileCleanedUp() throws IOException {
+        Path dataDirectory = Files.createDirectory(temporaryDirectory.resolve("tasks.txt"));
+        Path sentinel = dataDirectory.resolve("keep.txt");
+        Files.writeString(sentinel, "keep");
+
+        assertThrows(IOException.class, () ->
+                new Storage(dataDirectory.toString()).saveTasks(List.of(new Todo("new"))));
+
+        try (Stream<Path> files = Files.list(dataDirectory)) {
+            assertEquals(List.of(sentinel), files.toList());
+        }
+        assertEquals("keep", Files.readString(sentinel));
     }
 
     @Test

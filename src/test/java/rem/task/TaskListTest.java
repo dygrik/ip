@@ -2,6 +2,8 @@ package rem.task;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import rem.exception.InvalidTaskNumberException;
 import rem.exception.MissingNoteException;
+import rem.exception.RemException;
 
 /**
  * Tests the core task mutation and scheduling operations of {@link TaskList}.
@@ -101,6 +104,16 @@ public class TaskListTest {
     }
 
     @Test
+    public void noteOperations_outOfRangeTaskNumbers_exceptionThrown() {
+        TaskList tasks = new TaskList(List.of(new Todo("read book")));
+
+        assertThrows(InvalidTaskNumberException.class, () -> tasks.setNote(0, "note"));
+        assertThrows(InvalidTaskNumberException.class, () -> tasks.setNote(2, "note"));
+        assertThrows(InvalidTaskNumberException.class, () -> tasks.deleteNote(0));
+        assertThrows(InvalidTaskNumberException.class, () -> tasks.deleteNote(2));
+    }
+
+    @Test
     public void findTasksOn_matchingScheduledTasks_matchesInOriginalOrder() {
         LocalDate target = LocalDate.of(2026, 8, 29);
         Todo todo = new Todo("not scheduled");
@@ -134,6 +147,87 @@ public class TaskListTest {
         TaskList tasks = new TaskList(List.of(descriptionMatch, noteMatch, doubleMatch));
 
         assertEquals(List.of(descriptionMatch, noteMatch, doubleMatch), tasks.findTasks("alice"));
+    }
+
+    @Test
+    public void findTasks_turkishDefaultLocale_caseMatchingRemainsStable() {
+        java.util.Locale originalLocale = java.util.Locale.getDefault();
+        try {
+            java.util.Locale.setDefault(java.util.Locale.forLanguageTag("tr-TR"));
+            Todo descriptionMatch = new Todo("FILE REPORT");
+            Todo noteMatch = new Todo("other");
+            noteMatch.setNote("FILE NOTES");
+            TaskList tasks = new TaskList(List.of(descriptionMatch, noteMatch));
+
+            assertEquals(List.of(descriptionMatch, noteMatch), tasks.findTasks("file"));
+        } finally {
+            java.util.Locale.setDefault(originalLocale);
+        }
+    }
+
+    @Test
+    public void copy_allTaskTypesAndMutableState_independentDeepCopyReturned() throws Exception {
+        Todo todo = new Todo("read");
+        todo.markAsDone();
+        todo.setNote("library copy");
+        Deadline deadline = new Deadline("submit", LocalDateTime.of(2026, 10, 1, 18, 0));
+        Event event = new Event("conference", LocalDateTime.of(2026, 10, 2, 9, 0),
+                LocalDateTime.of(2026, 10, 3, 17, 0));
+        TaskList original = new TaskList(List.of(todo, deadline, event));
+
+        TaskList copy = original.copy();
+
+        assertEquals(3, copy.size());
+        assertInstanceOf(Todo.class, copy.getTask(1));
+        assertInstanceOf(Deadline.class, copy.getTask(2));
+        assertInstanceOf(Event.class, copy.getTask(3));
+        for (int taskNumber = 1; taskNumber <= original.size(); taskNumber++) {
+            assertNotSame(original.getTask(taskNumber), copy.getTask(taskNumber));
+            assertEquals(original.getTask(taskNumber).toString(), copy.getTask(taskNumber).toString());
+        }
+
+        copy.unmark(1);
+        copy.setNote(1, "changed copy");
+        copy.delete(2);
+        assertTrue(original.getTask(1).isDone());
+        assertEquals("library copy", original.getTask(1).getNote());
+        assertEquals(3, original.size());
+    }
+
+    @Test
+    public void validateUnique_sameIdentityExceptStatus_exceptionIdentifiesExistingTask()
+            throws RemException {
+        Todo existing = new Todo("read");
+        existing.markAsDone();
+        existing.setNote("library copy");
+        TaskList tasks = new TaskList(List.of(new Todo("other"), existing));
+        Todo candidate = new Todo("read");
+        candidate.setNote("library copy");
+
+        RemException exception = assertThrows(RemException.class, () ->
+                tasks.validateUnique(candidate));
+
+        assertEquals("This task already exists as task 2. Use list to see it.", exception.getMessage());
+    }
+
+    @Test
+    public void validateUnique_differentTypeScheduleDescriptionOrNote_noExceptionThrown()
+            throws RemException {
+        Deadline deadline = new Deadline("read", LocalDateTime.of(2026, 10, 1, 18, 0));
+        Event event = new Event("meet", LocalDateTime.of(2026, 10, 2, 9, 0),
+                LocalDateTime.of(2026, 10, 2, 10, 0));
+        TaskList tasks = new TaskList(List.of(new Todo("read"), deadline, event));
+
+        tasks.validateUnique(new Deadline("read", LocalDateTime.of(2026, 10, 2, 18, 0)));
+        tasks.validateUnique(new Deadline("write", LocalDateTime.of(2026, 10, 1, 18, 0)));
+        tasks.validateUnique(new Event("meet", LocalDateTime.of(2026, 10, 2, 9, 0),
+                LocalDateTime.of(2026, 10, 2, 11, 0)));
+        tasks.validateUnique(new Event("meet", LocalDateTime.of(2026, 10, 2, 8, 0),
+                LocalDateTime.of(2026, 10, 2, 10, 0)));
+        tasks.validateUnique(new Todo("write"));
+        Todo notedTodo = new Todo("read");
+        notedTodo.setNote("different");
+        tasks.validateUnique(notedTodo);
     }
 
     @Test
