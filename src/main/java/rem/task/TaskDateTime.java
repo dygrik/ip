@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.time.temporal.ChronoField;
 import java.util.List;
 import java.util.Locale;
@@ -29,7 +30,7 @@ public final class TaskDateTime {
                     .optionalEnd()
                     .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
                     .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-                    .toFormatter(Locale.ENGLISH),
+                    .toFormatter(Locale.ENGLISH).withResolverStyle(ResolverStyle.STRICT),
             new DateTimeFormatterBuilder()
                     .appendPattern("d/M/uuuu")
                     .optionalStart()
@@ -38,7 +39,7 @@ public final class TaskDateTime {
                     .optionalEnd()
                     .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
                     .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
-                    .toFormatter(Locale.ENGLISH));
+                    .toFormatter(Locale.ENGLISH).withResolverStyle(ResolverStyle.STRICT));
 
     private TaskDateTime() {
     }

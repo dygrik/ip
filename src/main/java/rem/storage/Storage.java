@@ -5,8 +5,10 @@ import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ public class Storage {
     private static final String NOTE_PREFIX = "N:";
 
     private final Path dataFile;
+    private boolean hasLoadFailure;
 
     /**
      * Creates storage that uses the specified data file.
@@ -43,11 +46,29 @@ public class Storage {
      * @throws IOException If the data file cannot be read or contains an unknown task type.
      */
     public ArrayList<Task> loadTasks() throws IOException {
+        try {
+            ArrayList<Task> tasks = readTasks();
+            hasLoadFailure = false;
+            return tasks;
+        } catch (AccessDeniedException e) {
+            hasLoadFailure = true;
+            throw new IOException("Access denied to the saved task file. Check its permissions and restart Rem.", e);
+        } catch (IOException e) {
+            hasLoadFailure = true;
+            throw e;
+        }
+    }
+
+    /** Reads all records before making any loaded tasks available. */
+    private ArrayList<Task> readTasks() throws IOException {
         ArrayList<Task> tasks = new ArrayList<>();
         if (Files.notExists(dataFile)) {
             return tasks;
         }
 
+        if (Files.isDirectory(dataFile)) {
+            throw new IOException("The saved task path is a directory. Choose a regular file and restart Rem.");
+        }
         List<String> taskLines = Files.readAllLines(dataFile);
         for (int i = 0; i < taskLines.size(); i++) {
             String taskLine = taskLines.get(i);
@@ -72,15 +93,39 @@ public class Storage {
      * @throws IOException If the data directory or file cannot be written.
      */
     public void saveTasks(List<Task> tasks) throws IOException {
-        Path parentDirectory = dataFile.getParent();
-        if (parentDirectory != null) {
-            Files.createDirectories(parentDirectory);
+        if (hasLoadFailure) {
+            throw new IOException("Saved tasks could not be loaded. Repair the data file or its permissions, "
+                    + "then restart Rem. The original file has been preserved.");
         }
+        Path destination = dataFile.toAbsolutePath();
+        try {
+            Files.createDirectories(destination.getParent());
+            List<String> taskLines = tasks.stream()
+                    .map(Storage::toDataLine)
+                    .toList();
+            writeAtomically(destination, taskLines);
+        } catch (IOException e) {
+            throw new IOException("Could not save " + destination
+                    + ". Check folder permissions and free disk space. " + e.getMessage(), e);
+        }
+    }
 
-        List<String> taskLines = tasks.stream()
-                .map(Storage::toDataLine)
-                .toList();
-        Files.write(dataFile, taskLines);
+    /** Writes beside the destination so replacement is atomic on supported filesystems. */
+    private static void writeAtomically(Path destination, List<String> taskLines) throws IOException {
+        Path temporaryFile = Files.createTempFile(destination.getParent(), "rem-", ".tmp");
+        try {
+            Files.write(temporaryFile, taskLines);
+            // Refuse an unsafe replacement if this filesystem does not support atomic moves.
+            Files.move(temporaryFile, destination, StandardCopyOption.ATOMIC_MOVE,
+                    StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            try {
+                Files.deleteIfExists(temporaryFile);
+            } catch (IOException cleanupError) {
+                e.addSuppressed(cleanupError);
+            }
+            throw e;
+        }
     }
 
     /**
@@ -92,16 +137,22 @@ public class Storage {
     private static String toDataLine(Task task) {
         String status = task.isDone() ? "1" : "0";
         String taskData;
+        String description = task.getDescription();
+        boolean needsEncoding = description.contains(" | ");
+        if (needsEncoding) {
+            description = Base64.getEncoder().encodeToString(description.getBytes(StandardCharsets.UTF_8));
+        }
+        String version = needsEncoding ? "2" : "";
         if (task instanceof Deadline deadline) {
-            taskData = String.join(" | ", "D", status, deadline.getDescription(),
+            taskData = String.join(" | ", "D" + version, status, description,
                     TaskDateTime.formatForStorage(deadline.getBy()));
         } else if (task instanceof Event event) {
-            taskData = String.join(" | ", "E", status, event.getDescription(),
+            taskData = String.join(" | ", "E" + version, status, description,
                     TaskDateTime.formatForStorage(event.getFrom()),
                     TaskDateTime.formatForStorage(event.getTo()));
         } else {
             assert task instanceof Todo : "Storage only supports todo, deadline, and event tasks";
-            taskData = String.join(" | ", "T", status, task.getDescription());
+            taskData = String.join(" | ", "T" + version, status, description);
         }
 
         if (!task.hasNote()) {
@@ -125,6 +176,13 @@ public class Storage {
             throw invalidDataLine(lineNumber);
         }
 
+        if (taskParts[0].matches("[TDE]2")) {
+            if (taskParts.length < 3) {
+                throw invalidDataLine(lineNumber);
+            }
+            taskParts[2] = decodeText(taskParts[2], lineNumber);
+            taskParts[0] = taskParts[0].substring(0, 1);
+        }
         return switch (taskParts[0]) {
             case "T" -> {
                 validateParts(taskParts, 3, lineNumber);
@@ -144,7 +202,7 @@ public class Storage {
                 try {
                     LocalDateTime from = TaskDateTime.parse(taskParts[3]);
                     LocalDateTime to = TaskDateTime.parse(taskParts[4]);
-                    if (to.isBefore(from)) {
+                    if (!to.isAfter(from)) {
                         throw invalidDataLine(lineNumber);
                     }
                     Task event = new Event(taskParts[2], from, to);
@@ -171,7 +229,7 @@ public class Storage {
             throw invalidDataLine(lineNumber);
         }
         for (int i = 2; i < expectedCount; i++) {
-            if (taskParts[i].isBlank()) {
+            if (taskParts[i].isBlank() || hasControlCharacters(taskParts[i])) {
                 throw invalidDataLine(lineNumber);
             }
         }
@@ -198,26 +256,35 @@ public class Storage {
             throw invalidDataLine(lineNumber);
         }
         String encodedNote = noteField.substring(NOTE_PREFIX.length());
+        String note = decodeText(encodedNote, lineNumber);
+        if (note.isBlank() || !note.equals(note.strip()) || hasControlCharacters(note)
+                || note.codePointCount(0, note.length()) > Task.MAX_NOTE_LENGTH) {
+            throw invalidDataLine(lineNumber);
+        }
+        task.setNote(note);
+        return task;
+    }
+
+    /** Decodes canonical Base64 and rejects malformed UTF-8 instead of replacing characters. */
+    private static String decodeText(String encodedText, int lineNumber) throws IOException {
         try {
-            byte[] noteBytes = Base64.getDecoder().decode(encodedNote);
-            if (!Base64.getEncoder().encodeToString(noteBytes).equals(encodedNote)) {
+            byte[] bytes = Base64.getDecoder().decode(encodedText);
+            if (!Base64.getEncoder().encodeToString(bytes).equals(encodedText)) {
                 throw invalidDataLine(lineNumber);
             }
-            String note = StandardCharsets.UTF_8.newDecoder()
+            return StandardCharsets.UTF_8.newDecoder()
                     .onMalformedInput(CodingErrorAction.REPORT)
                     .onUnmappableCharacter(CodingErrorAction.REPORT)
-                    .decode(ByteBuffer.wrap(noteBytes))
-                    .toString();
-            if (note.isBlank() || !note.equals(note.strip())
-                    || note.contains("\n") || note.contains("\r")
-                    || note.codePointCount(0, note.length()) > Task.MAX_NOTE_LENGTH) {
-                throw invalidDataLine(lineNumber);
-            }
-            task.setNote(note);
-            return task;
+                    .decode(ByteBuffer.wrap(bytes)).toString();
         } catch (IllegalArgumentException | CharacterCodingException e) {
             throw invalidDataLine(lineNumber);
         }
+    }
+
+    /** Checks single-line text, allowing tabs but no other control characters. */
+    private static boolean hasControlCharacters(String text) {
+        return text.codePoints().anyMatch(value -> Character.isISOControl(value) && value != '\t'
+                || value == 0x2028 || value == 0x2029);
     }
 
     /**

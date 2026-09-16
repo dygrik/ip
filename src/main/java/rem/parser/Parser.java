@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import rem.command.AddCommand;
 import rem.command.Command;
@@ -44,8 +46,16 @@ public class Parser {
      * @throws RemException If the command or any of its arguments are invalid.
      */
     public static Command parse(String input) throws RemException {
-        String command = input.trim();
+        if (input == null) {
+            throw new UnknownCommandException();
+        }
+        validateText(input);
+        String command = input.strip();
         CommandType commandType = getCommandType(command);
+        if ((commandType == CommandType.LIST || commandType == CommandType.BYE)
+                && command.split("\\s+").length != 1) {
+            throw new RemException(commandType.name().toLowerCase(Locale.ROOT) + " does not take arguments.");
+        }
         return switch (commandType) {
             case BYE -> new ExitCommand();
             case LIST -> new ListCommand();
@@ -90,7 +100,10 @@ public class Parser {
      */
     public static int parseTaskNumber(String command, String commandWord)
             throws InvalidTaskNumberException {
-        String numberText = command.substring(commandWord.length()).trim();
+        String numberText = command.substring(commandWord.length()).strip();
+        if (!numberText.matches("[0-9]+")) {
+            throw new InvalidTaskNumberException();
+        }
         try {
             int taskNumber = Integer.parseInt(numberText);
             if (taskNumber < 1) {
@@ -111,7 +124,7 @@ public class Parser {
      */
     public static LocalDate parseDate(String command) throws InvalidDateException {
         String dateText = command.substring(2).trim();
-        if (dateText.isEmpty() || dateText.contains(" ")) {
+        if (dateText.isEmpty() || dateText.matches(".*\\s+.*")) {
             throw new InvalidDateException();
         }
         try {
@@ -144,10 +157,12 @@ public class Parser {
      * @throws RemException If the task description or date-time arguments are invalid.
      */
     public static Task createTask(String command) throws RemException {
+        validateText(command);
+        command = command.strip();
         int noteIndex = findNoteIndex(command);
         String taskCommand = noteIndex < 0 ? command : command.substring(0, noteIndex).trim();
         String note = noteIndex < 0 ? null : command.substring(noteIndex + 6).strip();
-        String lowerCommand = taskCommand.toLowerCase(Locale.ROOT);
+        validateFields(taskCommand);
         Task task;
         if (isCommand(taskCommand, "todo")) {
             String description = taskCommand.substring(4).trim();
@@ -156,11 +171,11 @@ public class Parser {
             }
             task = new Todo(description);
         } else if (isCommand(taskCommand, "deadline")) {
-            task = createDeadline(taskCommand, lowerCommand);
+            task = createDeadline(taskCommand);
         } else {
             assert isCommand(taskCommand, "event")
                     : "Add command must be a todo, deadline, or event";
-            task = createEvent(taskCommand, lowerCommand);
+            task = createEvent(taskCommand);
         }
 
         if (note != null) {
@@ -248,24 +263,23 @@ public class Parser {
     private static boolean isCommand(String input, String commandWord) {
         String lowerInput = input.toLowerCase(Locale.ROOT);
         return lowerInput.equals(commandWord)
-                || lowerInput.startsWith(commandWord + " ");
+                || lowerInput.matches(commandWord + "\\s+.*");
     }
 
     /**
      * Creates a deadline from its description and due-date arguments.
      *
      * @param command Original user command, preserving the description's capitalization.
-     * @param lowerCommand Lowercase form of the command used to locate keywords.
      * @return Deadline described by the command.
      * @throws RemException If the description or due-date arguments are invalid.
      */
-    private static Deadline createDeadline(String command, String lowerCommand) throws RemException {
+    private static Deadline createDeadline(String command) throws RemException {
         String details = command.substring(8).trim();
         if (details.isEmpty()) {
             throw new EmptyDescriptionException();
         }
 
-        int byIndex = lowerCommand.indexOf(" /by");
+        int byIndex = findField(command, "by");
         if (byIndex < 0) {
             throw new InvalidDeadlineFormatException();
         }
@@ -280,7 +294,7 @@ public class Parser {
             throw new InvalidDeadlineFormatException();
         }
         try {
-            return new Deadline(description, TaskDateTime.parse(by));
+            return new Deadline(description, TaskDateTime.parse(by.replaceAll("\\s+", " ")));
         } catch (DateTimeParseException e) {
             throw new InvalidDeadlineFormatException();
         }
@@ -290,18 +304,17 @@ public class Parser {
      * Creates an event from its description, start, and end arguments.
      *
      * @param command Original user command, preserving the description's capitalization.
-     * @param lowerCommand Lowercase form of the command used to locate keywords.
      * @return Event described by the command.
      * @throws RemException If the description or date-time arguments are invalid.
      */
-    private static Event createEvent(String command, String lowerCommand) throws RemException {
+    private static Event createEvent(String command) throws RemException {
         String details = command.substring(5).trim();
         if (details.isEmpty()) {
             throw new EmptyDescriptionException();
         }
 
-        int fromIndex = lowerCommand.indexOf(" /from");
-        int toIndex = lowerCommand.indexOf(" /to", Math.max(fromIndex, 0) + 6);
+        int fromIndex = findField(command, "from");
+        int toIndex = findField(command, "to");
         if (fromIndex < 0 || toIndex < 0 || toIndex < fromIndex) {
             throw new InvalidEventFormatException();
         }
@@ -320,14 +333,48 @@ public class Parser {
             throw new InvalidEventFormatException();
         }
         try {
-            LocalDateTime startDateTime = TaskDateTime.parse(from);
-            LocalDateTime endDateTime = TaskDateTime.parse(to);
-            if (endDateTime.isBefore(startDateTime)) {
+            LocalDateTime startDateTime = TaskDateTime.parse(from.replaceAll("\\s+", " "));
+            LocalDateTime endDateTime = TaskDateTime.parse(to.replaceAll("\\s+", " "));
+            if (!endDateTime.isAfter(startDateTime)) {
                 throw new InvalidEventFormatException();
             }
             return new Event(description, startDateTime, endDateTime);
         } catch (DateTimeParseException e) {
             throw new InvalidEventFormatException();
+        }
+    }
+
+    /** Rejects multiline and control input while allowing tabs as separators or text. */
+    private static void validateText(String text) throws RemException {
+        if (text.codePoints().anyMatch(value -> Character.isISOControl(value) && value != '\t'
+                || value == 0x2028 || value == 0x2029)) {
+            throw new RemException("Use a single line without control characters.");
+        }
+    }
+
+    /** Locates a complete scheduling field, including its preceding whitespace. */
+    private static int findField(String command, String field) {
+        Matcher matcher = Pattern.compile("(?i)\\s/" + field + "(?=\\s|$)").matcher(command);
+        return matcher.find() ? matcher.start() : -1;
+    }
+
+    /** Requires each scheduling field exactly once and in the documented order. */
+    private static void validateFields(String command) throws RemException {
+        Matcher matcher = Pattern.compile("(?i)(?<=\\s)/(by|from|to)(?=\\s|$)").matcher(command);
+        StringBuilder fields = new StringBuilder();
+        while (matcher.find()) {
+            fields.append(matcher.group(1).toLowerCase(Locale.ROOT)).append(' ');
+        }
+        if (isCommand(command, "deadline") && !fields.toString().equals("by ")
+                && !command.equalsIgnoreCase("deadline")) {
+            throw new InvalidDeadlineFormatException();
+        }
+        if (isCommand(command, "event") && !fields.toString().equals("from to ")
+                && !command.equalsIgnoreCase("event")) {
+            throw new InvalidEventFormatException();
+        }
+        if (isCommand(command, "todo") && !fields.isEmpty()) {
+            throw new RemException("A todo has no scheduling fields. Use deadline or event instead.");
         }
     }
 }
