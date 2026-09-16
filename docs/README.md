@@ -89,3 +89,26 @@ storage separator.
 
 Files containing notes require this version of Rem or a newer one. Older Rem versions cannot load
 the additional note field.
+
+## Input validation and recovery
+
+- Leading and trailing spaces, repeated spaces, and tabs between command parts are accepted.
+  Spaces within descriptions and notes are preserved. Line breaks and control characters other
+  than tabs are rejected; punctuation, emoji, and links remain valid text.
+- `list` and `bye` take no arguments. Task numbers must contain digits and identify an existing task.
+- Deadlines require exactly one `/by`; events require one `/from` followed by one `/to`.
+  Each field needs a value. `/note` remains the last field: everything after it is literal note text.
+- Dates must exist in the calendar, and times must be between `0000` and `2359` with valid minutes.
+  An event must end strictly after it starts. Dates without times mean midnight; use explicit times
+  for events that start and end on the same day.
+- Adding a task with the same type, exact description, schedule, and note as an existing task is
+  rejected, even if the existing task is complete. Different capitalization or internal spacing
+  counts as different text. Existing duplicate records are retained when loading.
+- A missing data file starts a new list. If an existing file cannot be read or contains malformed
+  data, Rem reports the problem and blocks saving. Repair the file or its permissions and restart
+  Rem before making changes. Keep a copy of the original file when repairing it.
+- Failed saves leave the current task list unchanged. Fix the reported storage problem and retry.
+  Saving uses a temporary file and an atomic replacement; filesystems without atomic replacement
+  support are refused rather than risking an incomplete overwrite.
+- Descriptions containing ` | ` use Base64 UTF-8 text with record types `T2`, `D2`, or `E2`.
+  Existing records still load normally, but these new records require this version or newer.

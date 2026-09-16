@@ -130,13 +130,13 @@ Me: ____________________________________________________________
 Rem: I need to know when it starts and when it ends...
 Rem: Use: event DESCRIPTION /from YYYY-MM-DD [HHmm] /to YYYY-MM-DD [HHmm]
 Rem: Example: event meeting /from 2026-10-01 1400 /to 2026-10-01 1500
-Rem: The end must be at or after the start.
+Rem: The end must be after the start.
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: I need to know when it starts and when it ends...
 Rem: Use: event DESCRIPTION /from YYYY-MM-DD [HHmm] /to YYYY-MM-DD [HHmm]
 Rem: Example: event meeting /from 2026-10-01 1400 /to 2026-10-01 1500
-Rem: The end must be at or after the start.
+Rem: The end must be after the start.
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: You didn't say what you wanna do...
@@ -500,11 +500,12 @@ ____________________________________________________________
 
 **Aim:** Verify that malformed saved data does not crash Rem. Before starting Rem, create
 `data/rem.txt` containing `D | maybe | broken task`, which has an invalid status and missing due
-value.
+value. Attempting to add a task must preserve the original file.
 
 **Inputs:**
 
 ```text
+todo replacement
 list
 bye
 ```
@@ -521,6 +522,10 @@ ____________________________________________________________
 Rem: Hi! I'm Rem.
 Rem: I can help! Then maybe a nap.
 Rem: Oh. I couldn't load your saved tasks. I'm showing an empty list.
+____________________________________________________________
+Rem: Invalid task data on line 1.
+Me: ____________________________________________________________
+Rem: Your changes were not applied or saved. Saved tasks could not be loaded. Repair the data file or its permissions, then restart Rem. The original file has been preserved.
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Hmm... what to do now?
@@ -556,8 +561,9 @@ Rem: Hi! I'm Rem.
 Rem: I can help! Then maybe a nap.
 Rem: Oh. I couldn't load your saved tasks. I'm showing an empty list.
 ____________________________________________________________
+Rem: The saved task path is a directory. Choose a regular file and restart Rem.
 Me: ____________________________________________________________
-Rem: Oh. Your changes weren't saved. Could you check the data folder?
+Rem: Your changes were not applied or saved. Saved tasks could not be loaded. Repair the data file or its permissions, then restart Rem. The original file has been preserved.
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: [Yawn] Need more sleep. Time for bed...
@@ -861,6 +867,70 @@ ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Hmm... what to do now?
 Rem: No tasks yet. Got something for us to do?
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: [Yawn] Need more sleep. Time for bed...
+____________________________________________________________
+```
+
+
+## TC-16: Validate input and preserve literal descriptions
+
+**Aim:** Accept whitespace, reject duplicates and extra arguments, reject impossible dates, and save literal pipes safely.
+
+**Inputs:**
+
+```text
+  todo	read  book  
+todo read  book
+list extra
+bye later
+deadline report /by 2026-02-30
+todo A | B
+list
+bye
+```
+
+**Expected output:**
+
+```text
+____________________________________________________________
+ ____                      
+|  _ \    ___    _ __ ___  
+| |_) |  / _ \  | '_ ` _ \ 
+|  _ <  |  __/  | | | | | |
+|_| \_\  \___|  |_| |_| |_|
+Rem: Hi! I'm Rem.
+Rem: I can help! Then maybe a nap.
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: Got it! I put it on the list:
+Rem: [T][ ] read  book
+Rem: Yay! Our first task!
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: This task already exists as task 1. Use list to see it.
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: list does not take arguments.
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: bye does not take arguments.
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: When is this due by again?
+Rem: Use: deadline DESCRIPTION /by YYYY-MM-DD [HHmm]
+Rem: Example: deadline return book /by 2026-10-01 1800
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: Got it! I put it on the list:
+Rem: [T][ ] A | B
+Rem: Now you have 2 tasks in the list.
+____________________________________________________________
+Me: ____________________________________________________________
+Rem: Hmm... what to do now?
+Rem: 1.[T][ ] read  book
+Rem: 2.[T][ ] A | B
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: [Yawn] Need more sleep. Time for bed...

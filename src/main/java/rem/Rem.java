@@ -14,9 +14,10 @@ import rem.ui.Ui;
  */
 public class Rem {
     private final Storage storage;
-    private final TaskList tasks;
+    private TaskList tasks;
     private final Ui ui;
     private final boolean hasLoadError;
+    private final String loadError;
 
     /**
      * Creates Rem and loads tasks from the specified data file.
@@ -29,14 +30,17 @@ public class Rem {
 
         TaskList loadedTasks;
         boolean didLoadingFail = false;
+        String loadingError = "";
         try {
             loadedTasks = new TaskList(storage.loadTasks());
         } catch (IOException e) {
             loadedTasks = new TaskList();
             didLoadingFail = true;
+            loadingError = e.getMessage();
         }
         tasks = loadedTasks;
         hasLoadError = didLoadingFail;
+        loadError = loadingError;
     }
 
     /**
@@ -44,6 +48,9 @@ public class Rem {
      */
     public void run() {
         ui.showWelcome(hasLoadError);
+        if (hasLoadError) {
+            ui.showError(loadError);
+        }
 
         boolean isExit = false;
         while (!isExit) {
@@ -66,7 +73,8 @@ public class Rem {
      */
     public String getWelcome() {
         return "Hi! I'm Rem.\nI can help! Then maybe a nap."
-                + (hasLoadError ? "\nOh. I couldn't load your saved tasks. I'm showing an empty list." : "");
+                + (hasLoadError ? "\nOh. I couldn't load your saved tasks. I'm showing an empty list.\n"
+                        + loadError : "");
     }
 
     /**
@@ -102,12 +110,15 @@ public class Rem {
     private boolean execute(String input, Ui targetUi) {
         try {
             Command command = Parser.parse(input);
-            command.execute(tasks, targetUi, storage);
+            // Apply changes to a copy; publish it only after the command has saved successfully.
+            TaskList workingTasks = tasks.copy();
+            command.execute(workingTasks, targetUi, storage);
+            tasks = workingTasks;
             return command.isExit();
         } catch (RemException e) {
             targetUi.showError(e.getMessage());
         } catch (IOException e) {
-            targetUi.showError("Oh. Your changes weren't saved. Could you check the data folder?");
+            targetUi.showError("Your changes were not applied or saved. " + e.getMessage());
         }
         return false;
     }

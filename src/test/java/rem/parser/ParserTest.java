@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
@@ -201,4 +202,43 @@ public class ParserTest {
     public void createTask_nonAddCommand_assertionErrorThrown() {
         assertThrows(AssertionError.class, () -> Parser.createTask("list"));
     }
+    @Test
+    public void createTask_whitespaceAndLiteralNoteText_preserved() throws RemException {
+        Deadline task = assertInstanceOf(Deadline.class, Parser.createTask(
+                "  deadline\tread  book\t/BY\t2026-10-01   1200\t/note literal /note /by text  "));
+        assertEquals("read  book", task.getDescription());
+        assertEquals("literal /note /by text", task.getNote());
+        assertEquals(LocalDateTime.of(2026, 10, 1, 12, 0), task.getBy());
+        assertInstanceOf(Event.class, Parser.createTask(
+                "event\tmeeting\t/from\t2026-10-01\t0900\t/to\t2026-10-01\t1000"));
+    }
+
+    @Test
+    public void createTask_invalidSchedulingFields_rejected() {
+        for (String input : List.of(
+                "deadline report /by 2026-10-01 /by 2026-10-02",
+                "deadline report /by2026-10-01", "deadline report /by",
+                "deadline report /to 2026-10-01 /by 2026-10-02",
+                "event meeting /to 2026-10-02 /from 2026-10-01",
+                "event meeting /from 2026-10-01 /from 2026-10-01 /to 2026-10-02",
+                "event meeting /from 2026-10-01 /to 2026-10-02 /to 2026-10-03",
+                "event meeting /from 2026-10-01 /to 2026-10-01",
+                "event meeting /from 2026-10-01 /to",
+                "event meeting /from 2026-10-01 /note missing end",
+                "todo read /by 2026-10-01")) {
+            assertThrows(RemException.class, () -> Parser.createTask(input), input);
+        }
+    }
+
+    @Test
+    public void parse_invalidDatesAndTimes_rejectedAcrossCommands() {
+        for (String date : List.of("2026-02-30", "29/2/2026", "2026-04-31",
+                "2026-13-01", "2026-10-01 2400", "2026-10-01 1260")) {
+            assertThrows(RemException.class, () -> Parser.parse("deadline report /by " + date), date);
+            assertThrows(RemException.class, () -> Parser.parse("on " + date), date);
+            assertThrows(RemException.class, () ->
+                    Parser.parse("event meeting /from " + date + " /to 2027-01-01"), date);
+        }
+    }
+
 }

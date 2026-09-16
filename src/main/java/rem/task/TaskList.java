@@ -4,9 +4,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import rem.exception.InvalidTaskNumberException;
 import rem.exception.MissingNoteException;
+import rem.exception.RemException;
 
 /**
  * Stores Rem's tasks and provides operations for managing them.
@@ -184,6 +186,56 @@ public class TaskList {
     private void validateTaskNumber(int taskNumber) throws InvalidTaskNumberException {
         if (taskNumber < 1 || taskNumber > tasks.size()) {
             throw new InvalidTaskNumberException();
+        }
+    }
+
+    /**
+     * Copies tasks and their mutable state so failed commands can be discarded.
+     *
+     * @return An independent task list with the same contents.
+     */
+    public TaskList copy() {
+        ArrayList<Task> copies = new ArrayList<>();
+        for (Task task : tasks) {
+            Task copy;
+            if (task instanceof Deadline deadline) {
+                copy = new Deadline(task.getDescription(), deadline.getBy());
+            } else if (task instanceof Event event) {
+                copy = new Event(task.getDescription(), event.getFrom(), event.getTo());
+            } else {
+                copy = new Todo(task.getDescription());
+            }
+            if (task.isDone()) {
+                copy.markAsDone();
+            }
+            if (task.hasNote()) {
+                copy.setNote(task.getNote());
+            }
+            copies.add(copy);
+        }
+        return new TaskList(copies);
+    }
+
+    /**
+     * Rejects an addition matching an existing task, ignoring completion status.
+     *
+     * @param candidate Task being added.
+     * @throws RemException If the task already exists.
+     */
+    public void validateUnique(Task candidate) throws RemException {
+        for (int i = 0; i < tasks.size(); i++) {
+            Task existing = tasks.get(i);
+            boolean hasSameSchedule = true;
+            if (candidate instanceof Deadline deadline && existing instanceof Deadline other) {
+                hasSameSchedule = deadline.getBy().equals(other.getBy());
+            } else if (candidate instanceof Event event && existing instanceof Event other) {
+                hasSameSchedule = event.getFrom().equals(other.getFrom()) && event.getTo().equals(other.getTo());
+            }
+            if (candidate.getClass() == existing.getClass() && hasSameSchedule
+                    && candidate.getDescription().equals(existing.getDescription())
+                    && Objects.equals(candidate.getNote(), existing.getNote())) {
+                throw new RemException("This task already exists as task " + (i + 1) + ". Use list to see it.");
+            }
         }
     }
 }

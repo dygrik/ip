@@ -143,4 +143,38 @@ public class StorageTest {
 
         assertThrows(AssertionError.class, () -> storage.saveTasks(List.of(new Task("unsupported"))));
     }
+    @Test
+    public void saveAndLoadTasks_separatorInDescriptions_roundTripPreserved() throws IOException {
+        Storage storage = new Storage(temporaryDirectory.resolve("tasks.txt").toString());
+        List<Task> tasks = List.of(new Todo("A | B"),
+                new Deadline("C | D", LocalDateTime.of(2026, 10, 1, 0, 0)),
+                new Event("E | F", LocalDateTime.of(2026, 10, 1, 0, 0),
+                        LocalDateTime.of(2026, 10, 2, 0, 0)));
+        tasks.get(0).setNote("N: | literal");
+        storage.saveTasks(tasks);
+        assertEquals(tasks.stream().map(Task::toString).toList(),
+                storage.loadTasks().stream().map(Task::toString).toList());
+    }
+
+    @Test
+    public void loadTasks_invalidRecords_blockSavingWithoutChangingFile() throws IOException {
+        Path file = temporaryDirectory.resolve("tasks.txt");
+        for (String line : List.of("D | 0 | task | 2026-02-30", "D | 0 | task | 2026-10-01 2400",
+                "E | 0 | task | 2026-10-01 | 2026-10-01", "T2 | 0 | !invalid",
+                "T2 | 0 | /w==", "T | 0 | bad\u0000text", "T | 0 | task | N:YQpi")) {
+            Files.writeString(file, line);
+            Storage storage = new Storage(file.toString());
+            assertThrows(IOException.class, storage::loadTasks, line);
+            assertThrows(IOException.class, () -> storage.saveTasks(List.of(new Todo("new"))), line);
+            assertEquals(line, Files.readString(file));
+        }
+    }
+
+    @Test
+    public void loadTasks_existingDuplicates_kept() throws IOException {
+        Path file = temporaryDirectory.resolve("tasks.txt");
+        Files.writeString(file, "T | 0 | same\nT | 1 | same\n");
+        assertEquals(2, new Storage(file.toString()).loadTasks().size());
+    }
+
 }

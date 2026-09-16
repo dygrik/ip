@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -20,7 +21,7 @@ public class RemTest {
         Rem rem = new Rem(directory.resolve("rem.txt").toString());
         assertTrue(rem.getResponse("todos").text().contains("Try todo read book"));
         assertTrue(rem.getResponse("deadline report").text().contains("/by YYYY-MM-DD [HHmm]"));
-        assertTrue(rem.getResponse("event meeting").text().contains("The end must be at or after the start."));
+        assertTrue(rem.getResponse("event meeting").text().contains("The end must be after the start."));
         assertTrue(rem.getResponse("mark 1").text().contains("Use list to see task numbers"));
         assertFalse(rem.getResponse("list").text().contains("Example:"));
     }
@@ -109,8 +110,83 @@ public class RemTest {
         Rem rem = new Rem(blocked.toString());
         assertTrue(rem.getWelcome().contains("I couldn't load your saved tasks"));
         Response failure = rem.getResponse("todo read book");
-        assertEquals("Oh. Your changes weren't saved. Could you check the data folder?", failure.text());
+        assertTrue(failure.text().contains("Your changes were not applied or saved."));
+        assertFalse(rem.hasTasks());
         assertTrue(failure.isError());
         assertFalse(failure.isExit());
     }
+    @Test
+    public void getResponse_corruptFile_preservesOriginalAndReportsLine() throws IOException {
+        Path file = directory.resolve("corrupt.txt");
+        String original = "T | 0 | keep me\nD | maybe | broken\n";
+        Files.writeString(file, original);
+        Rem rem = new Rem(file.toString());
+        assertTrue(rem.getWelcome().contains("line 2"));
+        assertTrue(rem.getResponse("todo new task").isError());
+        assertFalse(rem.hasTasks());
+        assertEquals(original, Files.readString(file));
+    }
+
+    @Test
+    public void getResponse_saveFailures_allMutationsLeaveMemoryUnchanged() throws IOException {
+        Path file = directory.resolve("tasks.txt");
+        Rem rem = new Rem(file.toString());
+        rem.getResponse("todo read /note original");
+        String before = rem.getResponse("list").text();
+        Files.delete(file);
+        Files.createDirectory(file);
+        // A nonempty directory cannot be replaced even on filesystems allowing directory moves.
+        Files.writeString(file.resolve("keep.txt"), "keep");
+        for (String command : List.of("todo new", "delete 1", "mark 1", "unmark 1",
+                "note 1 replacement", "deletenote 1")) {
+            assertTrue(rem.getResponse(command).isError(), command);
+            assertEquals(before, rem.getResponse("list").text(), command);
+            assertEquals("keep", Files.readString(file.resolve("keep.txt")));
+        }
+        Files.delete(file.resolve("keep.txt"));
+        Files.delete(file);
+        assertFalse(rem.getResponse("todo new").isError());
+        assertEquals(rem.getResponse("list").text(), new Rem(file.toString()).getResponse("list").text());
+    }
+
+    @Test
+    public void getResponse_duplicates_ignoresStatusButDistinguishesDetails() {
+        Rem rem = new Rem(directory.resolve("tasks.txt").toString());
+        assertFalse(rem.getResponse("todo read").isError());
+        rem.getResponse("mark 1");
+        assertTrue(rem.getResponse("todo read").text().contains("already exists as task 1"));
+        assertFalse(rem.getResponse("todo read /note again").isError());
+        assertFalse(rem.getResponse("deadline read /by 2026-10-01").isError());
+        assertTrue(rem.getResponse("deadline read /by 1/10/2026").isError());
+        assertFalse(rem.getResponse("deadline read /by 2026-10-02").isError());
+        assertFalse(rem.getResponse("event read /from 2026-10-01 /to 2026-10-02").isError());
+        assertTrue(rem.getResponse("event read /from 2026-10-01 /to 2026-10-02").isError());
+        assertFalse(rem.getResponse("event read /from 2026-10-01 /to 2026-10-03").isError());
+    }
+
+    @Test
+    public void getResponse_badInput_followingValidCommandStillWorks() {
+        Rem rem = new Rem(directory.resolve("tasks.txt").toString());
+        for (String input : List.of("list extra", "bye later", "mark +1", "mark 9999999999999999",
+                "todo a\nb", "todo a\u0000b", "todo a /note b\rc", "note 1 a\u2028b")) {
+            Response response = rem.getResponse(input);
+            assertTrue(response.isError(), input);
+            assertFalse(response.isExit(), input);
+        }
+        assertFalse(rem.getResponse("  todo\tread  book  ").isError());
+        assertTrue(rem.getResponse("list").text().contains("read  book"));
+    }
+
+    @Test
+    public void getResponse_dataParentBecomesFile_reportsRecoveryWithoutApplyingTask() throws IOException {
+        Path parent = directory.resolve("data");
+        Rem rem = new Rem(parent.resolve("rem.txt").toString());
+        Files.writeString(parent, "preserve this file");
+        Response response = rem.getResponse("todo read");
+        assertTrue(response.isError());
+        assertTrue(response.text().contains("Check folder permissions and free disk space"));
+        assertFalse(rem.hasTasks());
+        assertEquals("preserve this file", Files.readString(parent));
+    }
+
 }
