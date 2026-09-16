@@ -105,36 +105,56 @@ Rem: No more sleeping. Need help?
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Hmm... I don't know what to do with that...
+Rem: Try todo read book to add a task, or list to view tasks.
+Rem: Commands: todo, deadline, event, list, find, on, mark, unmark, delete, note, deletenote, bye.
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Hmm... I don't know what to do with that...
+Rem: Try todo read book to add a task, or list to view tasks.
+Rem: Commands: todo, deadline, event, list, find, on, mark, unmark, delete, note, deletenote, bye.
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: You didn't say what you wanna do...
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: When is this due by again?
+Rem: Use: deadline DESCRIPTION /by YYYY-MM-DD [HHmm]
+Rem: Example: deadline return book /by 2026-10-01 1800
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: When is this due by again?
+Rem: Use: deadline DESCRIPTION /by YYYY-MM-DD [HHmm]
+Rem: Example: deadline return book /by 2026-10-01 1800
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: I need to know when it starts and when it ends...
+Rem: Use: event DESCRIPTION /from YYYY-MM-DD [HHmm] /to YYYY-MM-DD [HHmm]
+Rem: Example: event meeting /from 2026-10-01 1400 /to 2026-10-01 1500
+Rem: The end must be at or after the start.
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: I need to know when it starts and when it ends...
+Rem: Use: event DESCRIPTION /from YYYY-MM-DD [HHmm] /to YYYY-MM-DD [HHmm]
+Rem: Example: event meeting /from 2026-10-01 1400 /to 2026-10-01 1500
+Rem: The end must be at or after the start.
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: You didn't say what you wanna do...
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Please give me a task number I can work with...
+Rem: Use list to see task numbers, then use a positive number from that list.
+Rem: Example: mark 1
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Please give me a task number I can work with...
+Rem: Use list to see task numbers, then use a positive number from that list.
+Rem: Example: mark 1
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Please give me a task number I can work with...
+Rem: Use list to see task numbers, then use a positive number from that list.
+Rem: Example: mark 1
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Ok! I've added this:
@@ -143,9 +163,13 @@ Rem: Yay! Our first task!
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Please give me a task number I can work with...
+Rem: Use list to see task numbers, then use a positive number from that list.
+Rem: Example: mark 1
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Please give me a task number I can work with...
+Rem: Use list to see task numbers, then use a positive number from that list.
+Rem: Example: mark 1
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: [Yawn] Need more sleep. Time for bed...
@@ -227,6 +251,8 @@ Rem: No more sleeping. Need help?
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Please give me a task number I can work with...
+Rem: Use list to see task numbers, then use a positive number from that list.
+Rem: Example: mark 1
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Ok! I've added this:
@@ -257,6 +283,8 @@ Rem: Hmm... what to do now?
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Please give me a task number I can work with...
+Rem: Use list to see task numbers, then use a positive number from that list.
+Rem: Example: mark 1
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: [Yawn] Need more sleep. Time for bed...
@@ -309,6 +337,8 @@ Rem: 1.[T][ ] mixed case task
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Hmm... I don't know what to do with that...
+Rem: Try todo read book to add a task, or list to view tasks.
+Rem: Commands: todo, deadline, event, list, find, on, mark, unmark, delete, note, deletenote, bye.
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: [Yawn] Need more sleep. Time for bed...
@@ -789,9 +819,11 @@ on the JavaFX thread and submits real commands through Send and Enter. It checks
 - The single 40 px header portrait loads correctly.
 - Replies and the composer fit narrow and wide windows.
 - Submissions scroll to the latest reply; resizing preserves the reader's scroll position.
+- Up/Down recall submitted commands without submitting and restore the unfinished draft.
+- Vertical wheel scrolling moves 1.5 times the event distance and stops at both bounds.
 - Exit disables input and Send.
 
-The console cases above remain unchanged because their output and command behavior are unchanged.
+The console cases above include the new command syntax and recovery hints shared with the GUI.
 Launch the GUI with `gradlew run` or `java -jar build/libs/rem.jar` after `gradlew shadowJar`.
 The full-window artwork remains fixed behind a strongly dimmed conversation viewport.
 Rem's circular portrait appears only in the header; commands have no avatar.

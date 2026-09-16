@@ -22,6 +22,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -58,6 +61,13 @@ public class MainWindowTest {
             input.fireEvent(new ActionEvent());
             assertEquals(7, dialogs.getChildren().size());
             assertEquals("", input.getText());
+            input.setText("unfinished draft");
+            input.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.UP, false, false, false, false));
+            assertEquals("list", input.getText());
+            assertEquals(input.getLength(), input.getCaretPosition());
+            input.fireEvent(new KeyEvent(KeyEvent.KEY_PRESSED, "", "", KeyCode.DOWN, false, false, false, false));
+            assertEquals("unfinished draft", input.getText());
+            assertEquals(7, dialogs.getChildren().size());
             HBox reply = (HBox) dialogs.getChildren().get(6);
             assertTrue(((Label) reply.lookup("#dialog")).getText().contains("1.[T][ ] read book"));
             assertTrue(((Label) reply.lookup("#dialog")).getText()
@@ -112,6 +122,16 @@ public class MainWindowTest {
             // JavaFX adjusts the offset as text reflows, but must not jump to the latest message.
             assertTrue(scroll.getVvalue() > 0);
             assertTrue(scroll.getVvalue() < 0.9);
+            scroll.setVvalue(0.5);
+            double overflow = dialogs.getHeight() - scroll.getViewportBounds().getHeight();
+            scroll.fireEvent(createScroll(40));
+            assertEquals(0.5 - 60 / overflow, scroll.getVvalue(), 0.001);
+            scroll.fireEvent(createScroll(-40));
+            assertEquals(0.5, scroll.getVvalue(), 0.001);
+            scroll.fireEvent(createScroll(100000));
+            assertEquals(0, scroll.getVvalue());
+            scroll.fireEvent(createScroll(-100000));
+            assertEquals(1, scroll.getVvalue());
             input.setText("bye");
             send.fire();
             assertTrue(input.isDisabled());
@@ -120,5 +140,12 @@ public class MainWindowTest {
         });
         Platform.runLater(check);
         check.get(20, TimeUnit.SECONDS);
+    }
+
+    private static ScrollEvent createScroll(double deltaY) {
+        return new ScrollEvent(ScrollEvent.SCROLL, 0, 0, 0, 0,
+                false, false, false, false, false, false, 0, deltaY, 0, deltaY,
+                ScrollEvent.HorizontalTextScrollUnits.NONE, 0,
+                ScrollEvent.VerticalTextScrollUnits.NONE, 0, 0, null);
     }
 }

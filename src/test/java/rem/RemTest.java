@@ -16,6 +16,16 @@ public class RemTest {
     Path directory;
 
     @Test
+    public void getResponse_invalidCommands_providesActionableExamples() {
+        Rem rem = new Rem(directory.resolve("rem.txt").toString());
+        assertTrue(rem.getResponse("todos").text().contains("Try todo read book"));
+        assertTrue(rem.getResponse("deadline report").text().contains("/by YYYY-MM-DD [HHmm]"));
+        assertTrue(rem.getResponse("event meeting").text().contains("The end must be at or after the start."));
+        assertTrue(rem.getResponse("mark 1").text().contains("Use list to see task numbers"));
+        assertFalse(rem.getResponse("list").text().contains("Example:"));
+    }
+
+    @Test
     public void getResponse_addMarkReload_collectsLinesAndPersists() {
         String path = directory.resolve("rem.txt").toString();
         Rem rem = new Rem(path);

@@ -16,7 +16,10 @@ The GUI keeps the artwork behind a dimmed conversation area. User commands appea
 right-aligned bubbles, while Rem's replies use wider cards. Errors have a contrasting border
 and an Error heading, and the command stays in the input for correction. Blank submissions
 are ignored. Resize the window to suit your screen; reading older messages is not interrupted
-by resizing, and submitting a command scrolls to its reply.
+by resizing, and submitting a command scrolls to its reply. Vertical wheel scrolling is
+slightly faster. Use Up/Down in the input to recall commands; Down past the newest command
+restores your unfinished draft. History lasts for the current session and skips consecutive
+duplicates. Invalid commands, task numbers, deadlines, and events include recovery examples.
 
 Build the runnable JAR with `.\gradlew.bat shadowJar`, then run
 `java -jar build/libs/rem.jar`. The bundled JavaFX natives target Windows, macOS,

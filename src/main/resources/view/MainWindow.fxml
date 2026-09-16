@@ -26,7 +26,8 @@
     </center>
     <bottom>
         <VBox spacing="8" styleClass="composer">
-            <Label text="Try: todo read book · list · find book · bye" styleClass="subtitle" wrapText="true"/>
+            <Label text="Try: todo read book · list · find book · bye · &#8593;/&#8595; history"
+                   styleClass="subtitle" wrapText="true"/>
             <HBox spacing="10">
                 <TextField fx:id="userInput" promptText="Tell Rem what to do…"
                            HBox.hgrow="ALWAYS" onAction="#handleUserInput"/>
