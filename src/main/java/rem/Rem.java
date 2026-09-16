@@ -65,8 +65,17 @@ public class Rem {
      * @return Initial graphical conversation message.
      */
     public String getWelcome() {
-        return "Hello! I'm Rem!\nNo more sleeping. Need help?"
-                + (hasLoadError ? "\nRem found nothing... Guess I'll start a new one!" : "");
+        return "Hi! I'm Rem.\nI can help! Then maybe a nap."
+                + (hasLoadError ? "\nOh. I couldn't load your saved tasks. I'm showing an empty list." : "");
+    }
+
+    /**
+     * Reports whether there are tasks for the graphical empty-state display.
+     *
+     * @return Whether at least one task exists.
+     */
+    public boolean hasTasks() {
+        return tasks.size() > 0;
     }
 
     /**
@@ -98,7 +107,7 @@ public class Rem {
         } catch (RemException e) {
             targetUi.showError(e.getMessage());
         } catch (IOException e) {
-            targetUi.showError("Rem couldn't save the tasks... Could you check the data folder?");
+            targetUi.showError("Oh. Your changes weren't saved. Could you check the data folder?");
         }
         return false;
     }

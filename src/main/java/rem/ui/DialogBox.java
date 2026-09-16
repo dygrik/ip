@@ -50,7 +50,9 @@ public class DialogBox extends HBox {
             message.getStyleClass().add("user-message");
             message.setAccessibleText("You: " + text);
         } else {
-            message.prefWidthProperty().bind(widthProperty().multiply(messageWidthRatio));
+            if (text.contains("\n")) {
+                message.prefWidthProperty().bind(widthProperty().multiply(messageWidthRatio));
+            }
             message.setAccessibleText((isError ? "Error: " : "RemBot: ") + text);
         }
         if (isError) {

@@ -32,7 +32,11 @@ public class FindCommand extends Command {
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         List<Task> matchingTasks = tasks.findTasks(keyword);
-        ui.showMessage("Here are the matching tasks in your list:");
+        if (matchingTasks.isEmpty()) {
+            ui.showMessage("Didn't find any tasks matching '" + keyword + "'. Try another word?");
+            return;
+        }
+        ui.showMessage("Found these!");
         ui.showNumberedTasks(matchingTasks);
     }
 }

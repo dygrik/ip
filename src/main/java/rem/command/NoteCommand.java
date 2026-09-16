@@ -40,6 +40,6 @@ public class NoteCommand extends Command {
             throws IOException, InvalidTaskNumberException {
         Task task = tasks.setNote(taskNumber, note);
         storage.saveTasks(tasks.getTasks());
-        ui.showMessages("Hmm... Rem will try his best to remember:", task.toString());
+        ui.showMessages("I'll keep this note with your task:", task.toString());
     }
 }

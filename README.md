@@ -13,7 +13,7 @@ with `/note`, or use `note TASK_NUMBER NOTE` afterward. See the
 [user guide](docs/README.md) for examples. The farewell stays visible briefly before closing.
 
 The GUI keeps the artwork behind a dimmed conversation area. User commands appear as compact
-right-aligned bubbles, while Rem's replies use wider cards. Errors have a contrasting border
+right-aligned bubbles. Rem's short replies stay compact, while lists and help use wider cards. Errors have a contrasting border
 and an Error heading, and the command stays in the input for correction. Blank submissions
 are ignored. Resize the window to suit your screen; reading older messages is not interrupted
 by resizing, and submitting a command scrolls to its reply. Vertical wheel scrolling is
@@ -76,3 +76,15 @@ Prerequisites: JDK 25, update Intellij to the most recent version.
    ```
 
 **Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
+
+## Rem's personality
+
+Rem speaks as a helpful companion, with short first-person replies and occasional nap references.
+Empty lists and searches explain what happened; storage errors clearly identify unsaved changes.
+The original list introduction, missing-description message, and 200-character note-limit message
+are retained.
+
+The interface uses powder-blue controls, a turquoise focus border, and bottom-right anchored artwork.
+A small helper illustration appears while there are no tasks. After 45 seconds without interaction,
+Rem's portrait dims and shows zZ; typing, clicking, pressing a key, or scrolling wakes it immediately.
+The idle state never delays commands.
