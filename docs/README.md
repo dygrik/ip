@@ -261,9 +261,14 @@ bye
 
 The farewell remains visible briefly before the window closes.
 
-If `data/rem.txt` does not exist, RemBot starts with an empty task list. If the file cannot be read,
-RemBot reports the problem and blocks further saves to protect the existing data. Repair the file or
-its permissions, then restart RemBot.
+If `data/rem.txt` does not exist, RemBot starts with an empty task list. If its contents are malformed,
+RemBot offers to start fresh or exit. Choosing **Start Fresh** keeps the damaged data beside the
+original file as a timestamped backup such as `rem-corrupt-20260917-143025.txt`, then creates a new
+empty `rem.txt`. RemBot never replaces the malformed file without confirmation.
+
+If the file cannot be accessed because of its path or permissions, RemBot reports the problem and
+blocks further saves to protect the existing data. Repair the path or permissions, then restart
+RemBot; the start-fresh option is not shown for these access problems.
 
 ## Input rules
 

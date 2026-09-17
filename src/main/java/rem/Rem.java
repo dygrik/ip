@@ -1,6 +1,7 @@
 package rem;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 import rem.command.Command;
 import rem.exception.RemException;
@@ -16,8 +17,8 @@ public class Rem {
     private final Storage storage;
     private TaskList tasks;
     private final Ui ui;
-    private final boolean hasLoadError;
-    private final String loadError;
+    private boolean hasLoadError;
+    private String loadError;
 
     /**
      * Creates Rem and loads tasks from the specified data file.
@@ -84,6 +85,29 @@ public class Rem {
      */
     public boolean hasTasks() {
         return tasks.size() > 0;
+    }
+
+    /**
+     * Reports whether malformed saved data can be safely replaced after being backed up.
+     *
+     * @return Whether the start-fresh recovery option is available.
+     */
+    public boolean canStartFresh() {
+        return storage.canStartFresh();
+    }
+
+    /**
+     * Backs up malformed saved data and starts with an empty task list.
+     *
+     * @return Path of the backup containing the original data.
+     * @throws IOException If the backup or empty replacement cannot be created safely.
+     */
+    public Path startFresh() throws IOException {
+        Path backup = storage.startFresh();
+        tasks = new TaskList();
+        hasLoadError = false;
+        loadError = "";
+        return backup;
     }
 
     /**

@@ -16,11 +16,13 @@ public class Main extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("/view/MainWindow.fxml"));
         Scene scene = new Scene(loader.load());
-        loader.<MainWindow>getController().setRem(new Rem("data/rem.txt"));
+        MainWindow controller = loader.getController();
+        controller.setRem(new Rem("data/rem.txt"));
         stage.setTitle("RemBot");
         stage.setScene(scene);
         stage.setMinWidth(380);
         stage.setMinHeight(400);
         stage.show();
+        controller.showRecoveryDialog(stage);
     }
 }

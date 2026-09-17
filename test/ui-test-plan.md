@@ -525,7 +525,7 @@ Rem: Oh. I couldn't load your saved tasks. I'm showing an empty list.
 ____________________________________________________________
 Rem: Invalid task data on line 1.
 Me: ____________________________________________________________
-Rem: Your changes were not applied or saved. Saved tasks could not be loaded. Repair the data file or its permissions, then restart Rem. The original file has been preserved.
+Rem: Your changes were not applied or saved. Saved tasks could not be loaded. Repair the data file or its permissions, then restart RemBot. The original file has been preserved.
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: Hmm... what to do now?
@@ -561,9 +561,9 @@ Rem: Hi! I'm Rem.
 Rem: I can help! Then maybe a nap.
 Rem: Oh. I couldn't load your saved tasks. I'm showing an empty list.
 ____________________________________________________________
-Rem: The saved task path is a directory. Choose a regular file and restart Rem.
+Rem: The saved task path is a directory. Choose a regular file and restart RemBot.
 Me: ____________________________________________________________
-Rem: Your changes were not applied or saved. Saved tasks could not be loaded. Repair the data file or its permissions, then restart Rem. The original file has been preserved.
+Rem: Your changes were not applied or saved. Saved tasks could not be loaded. Repair the data file or its permissions, then restart RemBot. The original file has been preserved.
 ____________________________________________________________
 Me: ____________________________________________________________
 Rem: [Yawn] Need more sleep. Time for bed...
@@ -955,6 +955,10 @@ on the JavaFX thread and submits real commands through Send and Enter. It checks
 - Up/Down recall submitted commands without submitting and restore the unfinished draft.
 - Vertical wheel scrolling moves 1.5 times the event distance and stops at both bounds.
 - Exit disables input and Send.
+- Malformed saved task data opens a modal Start Fresh/Exit prompt. Start Fresh preserves the
+  original contents in a timestamped `rem-corrupt-*.txt` backup before enabling an empty task list;
+  dismissing the prompt or choosing Exit closes RemBot without changing the data file.
+- File path and permission failures do not offer Start Fresh.
 
 The console cases above include the new command syntax and recovery hints shared with the GUI.
 Launch the GUI with `gradlew run` or `java -jar build/libs/rembot.jar` after `gradlew shadowJar`.

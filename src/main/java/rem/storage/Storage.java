@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -26,9 +27,12 @@ import rem.task.Todo;
  */
 public class Storage {
     private static final String NOTE_PREFIX = "N:";
+    private static final DateTimeFormatter BACKUP_TIMESTAMP_FORMAT =
+            DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
     private final Path dataFile;
     private boolean hasLoadFailure;
+    private boolean canStartFresh;
 
     /**
      * Creates storage that uses the specified data file.
@@ -49,14 +53,72 @@ public class Storage {
         try {
             ArrayList<Task> tasks = readTasks();
             hasLoadFailure = false;
+            canStartFresh = false;
             return tasks;
+        } catch (InvalidDataException e) {
+            hasLoadFailure = true;
+            canStartFresh = true;
+            throw e;
         } catch (AccessDeniedException e) {
             hasLoadFailure = true;
-            throw new IOException("Access denied to the saved task file. Check its permissions and restart Rem.", e);
+            canStartFresh = false;
+            throw new IOException("Access denied to the saved task file. Check its permissions and restart RemBot.",
+                    e);
         } catch (IOException e) {
             hasLoadFailure = true;
+            canStartFresh = false;
             throw e;
         }
+    }
+
+    /**
+     * Reports whether the last load failed because the data contents were malformed.
+     *
+     * @return Whether starting with a safely backed-up empty file is available.
+     */
+    public boolean canStartFresh() {
+        return canStartFresh;
+    }
+
+    /**
+     * Backs up malformed task data and replaces it with an empty data file.
+     *
+     * @return Path of the backup containing the original data.
+     * @throws IOException If recovery is unavailable or the backup or replacement cannot be created.
+     */
+    public Path startFresh() throws IOException {
+        if (!hasLoadFailure || !canStartFresh) {
+            throw new IOException("Starting fresh is only available after malformed task data is detected.");
+        }
+
+        Path source = dataFile.toAbsolutePath();
+        Path backup = createBackupPath(source);
+        try {
+            Files.copy(source, backup);
+            writeAtomically(source, List.of());
+        } catch (IOException e) {
+            throw new IOException("Could not safely back up and replace " + source
+                    + ". The original file has not been changed. " + e.getMessage(), e);
+        }
+        hasLoadFailure = false;
+        canStartFresh = false;
+        return backup;
+    }
+
+    /** Creates a non-conflicting backup path beside the task data file. */
+    private static Path createBackupPath(Path source) {
+        String fileName = source.getFileName().toString();
+        int extensionStart = fileName.lastIndexOf('.');
+        String stem = extensionStart > 0 ? fileName.substring(0, extensionStart) : fileName;
+        String extension = extensionStart > 0 ? fileName.substring(extensionStart) : "";
+        String timestamp = LocalDateTime.now().format(BACKUP_TIMESTAMP_FORMAT);
+        Path backup = source.resolveSibling(stem + "-corrupt-" + timestamp + extension);
+        int suffix = 2;
+        while (Files.exists(backup)) {
+            backup = source.resolveSibling(stem + "-corrupt-" + timestamp + "-" + suffix + extension);
+            suffix++;
+        }
+        return backup;
     }
 
     /** Reads all records before making any loaded tasks available. */
@@ -67,7 +129,7 @@ public class Storage {
         }
 
         if (Files.isDirectory(dataFile)) {
-            throw new IOException("The saved task path is a directory. Choose a regular file and restart Rem.");
+            throw new IOException("The saved task path is a directory. Choose a regular file and restart RemBot.");
         }
         List<String> taskLines = Files.readAllLines(dataFile);
         for (int i = 0; i < taskLines.size(); i++) {
@@ -95,7 +157,7 @@ public class Storage {
     public void saveTasks(List<Task> tasks) throws IOException {
         if (hasLoadFailure) {
             throw new IOException("Saved tasks could not be loaded. Repair the data file or its permissions, "
-                    + "then restart Rem. The original file has been preserved.");
+                    + "then restart RemBot. The original file has been preserved.");
         }
         Path destination = dataFile.toAbsolutePath();
         try {
@@ -294,6 +356,13 @@ public class Storage {
      * @return Exception describing where invalid data was found.
      */
     private static IOException invalidDataLine(int lineNumber) {
-        return new IOException("Invalid task data on line " + lineNumber + ".");
+        return new InvalidDataException("Invalid task data on line " + lineNumber + ".");
+    }
+
+    /** Identifies malformed contents separately from file access failures. */
+    private static class InvalidDataException extends IOException {
+        private InvalidDataException(String message) {
+            super(message);
+        }
     }
 }

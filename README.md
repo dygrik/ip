@@ -21,6 +21,8 @@ by resizing, and submitting a command scrolls to its reply. Vertical wheel scrol
 slightly faster. Use Up/Down in the input to recall commands; Down past the newest command
 restores your unfinished draft. History lasts for the current session and skips consecutive
 duplicates. Invalid commands, task numbers, deadlines, and events include recovery examples.
+If saved task data is malformed, RemBot can start with an empty list after preserving the damaged
+file as a timestamped backup. It never replaces the file without confirmation.
 
 Build the runnable JAR with `.\gradlew.bat shadowJar`, then run
 `java -jar build/libs/rembot.jar`. The bundled JavaFX natives target Windows, macOS,

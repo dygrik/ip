@@ -249,14 +249,36 @@ public class StorageTest {
     }
 
     @Test
+    public void startFresh_malformedData_backsUpOriginalAndEnablesSaving() throws IOException {
+        Path file = temporaryDirectory.resolve("tasks.txt");
+        String original = "T | 0 | keep me\nD | maybe | broken\n";
+        Files.writeString(file, original);
+        Storage storage = new Storage(file.toString());
+        assertThrows(IOException.class, storage::loadTasks);
+        assertTrue(storage.canStartFresh());
+
+        Path backup = storage.startFresh();
+
+        assertTrue(backup.getFileName().toString()
+                .matches("tasks-corrupt-\\d{8}-\\d{6}(?:-\\d+)?\\.txt"));
+        assertEquals(original, Files.readString(backup));
+        assertEquals("", Files.readString(file));
+        assertFalse(storage.canStartFresh());
+        storage.saveTasks(List.of(new Todo("new")));
+        assertEquals(List.of("T | 0 | new"), Files.readAllLines(file));
+    }
+
+    @Test
     public void loadTasks_dataPathIsDirectory_actionableExceptionThrown() throws IOException {
         Path dataDirectory = Files.createDirectory(temporaryDirectory.resolve("tasks.txt"));
+        Storage storage = new Storage(dataDirectory.toString());
 
-        IOException exception = assertThrows(IOException.class, () ->
-                new Storage(dataDirectory.toString()).loadTasks());
+        IOException exception = assertThrows(IOException.class, storage::loadTasks);
 
-        assertEquals("The saved task path is a directory. Choose a regular file and restart Rem.",
+        assertEquals("The saved task path is a directory. Choose a regular file and restart RemBot.",
                 exception.getMessage());
+        assertFalse(storage.canStartFresh());
+        assertThrows(IOException.class, storage::startFresh);
     }
 
     @Test

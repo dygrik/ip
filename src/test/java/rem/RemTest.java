@@ -130,6 +130,7 @@ public class RemTest {
         assertTrue(failure.isError());
         assertFalse(failure.isExit());
     }
+
     @Test
     public void getResponse_corruptFile_preservesOriginalAndReportsLine() throws IOException {
         Path file = directory.resolve("corrupt.txt");
@@ -140,6 +141,24 @@ public class RemTest {
         assertTrue(rem.getResponse("todo new task").isError());
         assertFalse(rem.hasTasks());
         assertEquals(original, Files.readString(file));
+    }
+
+    @Test
+    public void startFresh_corruptFile_backsUpOriginalAndAcceptsCommands() throws IOException {
+        Path file = directory.resolve("rem.txt");
+        String original = "D | maybe | broken\n";
+        Files.writeString(file, original);
+        Rem rem = new Rem(file.toString());
+        assertTrue(rem.canStartFresh());
+
+        Path backup = rem.startFresh();
+
+        assertEquals(original, Files.readString(backup));
+        assertEquals("", Files.readString(file));
+        assertFalse(rem.canStartFresh());
+        assertFalse(rem.getResponse("todo replacement").isError());
+        assertTrue(rem.hasTasks());
+        assertEquals(List.of("T | 0 | replacement"), Files.readAllLines(file));
     }
 
     @Test

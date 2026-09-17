@@ -1,9 +1,16 @@
 package rem.ui;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Optional;
+
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -15,6 +22,7 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Window;
 import javafx.util.Duration;
 import rem.Rem;
 import rem.Response;
@@ -127,6 +135,52 @@ public class MainWindow {
         dialogContainer.getChildren().add(new DialogBox(rem.getWelcome(), false));
         updateEmptyState();
         wakePortrait();
+    }
+
+    /**
+     * Offers a safe reset when Rem detected malformed saved task data.
+     *
+     * @param owner Window that owns the modal recovery prompt.
+     */
+    public void showRecoveryDialog(Window owner) {
+        if (!rem.canStartFresh()) {
+            return;
+        }
+
+        ButtonType startFreshButton = new ButtonType("Start Fresh", ButtonData.OK_DONE);
+        ButtonType exitButton = new ButtonType("Exit", ButtonData.CANCEL_CLOSE);
+        Alert recoveryAlert = new Alert(Alert.AlertType.CONFIRMATION,
+                "RemBot couldn't read your saved tasks. Your original file has not been changed.\n\n"
+                        + "Would you like to start with an empty task list? The damaged file will be kept as a backup.",
+                startFreshButton, exitButton);
+        recoveryAlert.initOwner(owner);
+        recoveryAlert.setTitle("Recover saved tasks");
+        recoveryAlert.setHeaderText("The saved task file is damaged");
+
+        Optional<ButtonType> result = recoveryAlert.showAndWait();
+        if (result.isEmpty() || result.get() != startFreshButton) {
+            Platform.exit();
+            return;
+        }
+
+        try {
+            Path backup = rem.startFresh();
+            dialogContainer.getChildren().add(new DialogBox(
+                    "Started fresh with an empty task list.\nYour damaged file was saved as "
+                            + backup.getFileName() + ".",
+                    false));
+            updateEmptyState();
+            userInput.clear();
+            userInput.requestFocus();
+        } catch (IOException e) {
+            Alert failureAlert = new Alert(Alert.AlertType.ERROR,
+                    "Nothing was replaced. " + e.getMessage(), ButtonType.OK);
+            failureAlert.initOwner(owner);
+            failureAlert.setTitle("Recovery failed");
+            failureAlert.setHeaderText("RemBot could not create a safe backup");
+            failureAlert.showAndWait();
+            Platform.exit();
+        }
     }
 
     @FXML
