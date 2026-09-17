@@ -1,93 +1,110 @@
 # RemBot
 
-RemBot is a task-tracking chatbot product. Its assistant, Rem, helps users manage their tasks.
-Given below are instructions on how to use RemBot.
+RemBot is a desktop task manager with a chat-style interface. Its assistant, Rem, can track todos,
+deadlines, events, and notes using short text commands.
+
+![RemBot graphical interface](docs/Ui.png)
+
+## Features
+
+- Create todos, deadlines, and events.
+- Mark, unmark, and delete tasks.
+- Attach notes to tasks.
+- Search by keyword or view scheduled tasks by date.
+- Recall commands with the Up and Down arrow keys.
+- Save tasks automatically between sessions.
+- Recover from malformed saved data without overwriting the original file.
+
+See the [User Guide](docs/README.md) for the full command reference and examples.
 
 ## Running RemBot
 
-Use Java 25 and run `.\gradlew.bat run` to open the JavaFX chat window.
-Send a command with Enter or the Send button. Tasks are saved in `data/rem.txt`
-relative to the directory where you launch RemBot. Existing console commands also work
-in the GUI, including `todo`, `deadline`, `event`, `list`, `mark`, `unmark`,
-`delete`, `note`, `deletenote`, `find`, `on`, and `bye`. Add a note while creating a task
-with `/note`, or use `note TASK_NUMBER NOTE` afterward. See the
-[user guide](docs/README.md) for examples. The farewell stays visible briefly before closing.
+RemBot requires Java 25.
 
-The GUI keeps the artwork behind a dimmed conversation area. User commands appear as compact
-right-aligned bubbles. Rem's short replies stay compact, while lists and help use wider cards. Errors have a contrasting border
-and an Error heading, and the command stays in the input for correction. Blank submissions
-are ignored. Resize the window to suit your screen; reading older messages is not interrupted
-by resizing, and submitting a command scrolls to its reply. Vertical wheel scrolling is
-slightly faster. Use Up/Down in the input to recall commands; Down past the newest command
-restores your unfinished draft. History lasts for the current session and skips consecutive
-duplicates. Invalid commands, task numbers, deadlines, and events include recovery examples.
-If saved task data is malformed, RemBot can start with an empty list after preserving the damaged
-file as a timestamped backup. It never replaces the file without confirmation.
+Download `rembot.jar` from the [latest release](https://github.com/dygrik/ip/releases/latest), open a
+terminal in the download folder, and run:
 
-Build the runnable JAR with `.\gradlew.bat shadowJar`, then run
-`java -jar build/libs/rembot.jar`. The bundled JavaFX natives target Windows, macOS,
-and Linux x64, matching the tutorial setup. Other architectures need matching JavaFX natives.
-For the console interface, use `.\gradlew.bat runConsole` or run `rem.Rem` in the IDE.
-For the GUI in IntelliJ, run `rem.Launcher` after refreshing Gradle.
+```text
+java -jar rembot.jar
+```
 
-FXML layouts are in `src/main/resources/view` and styling is in
-`src/main/resources/css/main.css`. The supplied Rem picture is bundled as a resource.
+The bundled JavaFX libraries support Windows, macOS, and Linux on x64 systems. Other architectures
+need matching JavaFX native libraries.
 
-## Checking code style
+## Quick start
 
-Use JDK 25 and run these commands from the project directory:
+Enter commands in the text box and press Enter or select **Send**. For example:
+
+```text
+todo read book
+deadline submit report /by 2026-10-01 1800
+event project meeting /from 2026-10-02 1400 /to 2026-10-02 1500
+list
+mark 1
+find report
+on 2026-10-02
+bye
+```
+
+The main commands are:
+
+| Command | Purpose |
+| --- | --- |
+| `todo DESCRIPTION` | Add a todo |
+| `deadline DESCRIPTION /by DATE [TIME]` | Add a deadline |
+| `event DESCRIPTION /from DATE [TIME] /to DATE [TIME]` | Add an event |
+| `list` | Show all tasks |
+| `mark NUMBER` / `unmark NUMBER` | Change a task's completion status |
+| `delete NUMBER` | Delete a task |
+| `note NUMBER NOTE` / `deletenote NUMBER` | Add, replace, or remove a note |
+| `find KEYWORD` | Search task descriptions and notes |
+| `on DATE` | Show deadlines and events scheduled on a date |
+| `bye` | Close RemBot |
+
+Add `/note NOTE` to a `todo`, `deadline`, or `event` command to create the task with a note.
+
+## Saved data
+
+RemBot stores tasks in `data/rem.txt`, relative to the folder from which it is launched. If that file
+contains malformed data, RemBot offers to start with an empty list or exit. Choosing **Start Fresh**
+first copies the damaged data to a timestamped backup in the same folder.
+
+## Running from source
+
+Clone the repository and open its root directory in a terminal. On Windows, use:
 
 ```powershell
-.\gradlew.bat checkstyleMain checkstyleTest
+.\gradlew.bat run
+```
+
+On macOS or Linux, use:
+
+```bash
+./gradlew run
+```
+
+To run RemBot from IntelliJ IDEA, import the project as a Gradle project, select JDK 25, refresh
+Gradle, and run `rem.Launcher`.
+
+## Building and testing
+
+Run all automated tests and code-style checks:
+
+```powershell
 .\gradlew.bat check
 ```
 
-The first command checks production and test Java code. The second runs both Checkstyle
-and the JUnit tests. On macOS/Linux, use `./gradlew` instead of `.\gradlew.bat`.
-Errors and warnings fail the checks. HTML reports are written to
-`build/reports/checkstyle/main.html` and `build/reports/checkstyle/test.html`.
+Build the runnable JAR:
 
-Checkstyle 11.0.0 uses the SE-EDU rules in `config/checkstyle/checkstyle.xml`, copied from
-[AddressBook Level 3](https://github.com/se-edu/addressbook-level3/tree/master/config/checkstyle)
-as directed by the [SE-EDU tutorial](https://se-education.org/guides/tutorials/checkstyle.html).
-`suppressions.xml` retains the tutorial's test-code Javadoc exceptions; production code
-is not exempted. Checkstyle complements the coding-standard skill and manual review;
-it does not verify every judgment-based rule or application correctness.
+```powershell
+.\gradlew.bat shadowJar
+```
 
-For optional IntelliJ integration, install CheckStyle-IDEA, select version 11.0.0,
-import `config/checkstyle/checkstyle.xml` as a local configuration, and enable scanning
-of Java sources including tests. Gradle remains the shared, reproducible check.
+The JAR is written to `build/libs/rembot.jar`. Use `./gradlew` instead of `./gradlew.bat` on macOS
+or Linux.
 
-## Setting up in Intellij
+The console interface is also available for development and scripted testing:
 
-Prerequisites: JDK 25, update Intellij to the most recent version.
-
-1. Open Intellij (if you are not in the welcome screen, click `File` > `Close Project` to close the existing project first)
-1. Open the project into Intellij as follows:
-   1. Click `Open`.
-   1. Select the project directory, and click `OK`.
-   1. If there are any further prompts, accept the defaults.
-1. Configure the project to use **JDK 25** (not other versions) as explained in [here](https://www.jetbrains.com/help/idea/sdk.html#set-up-jdk).<br>
-   In the same dialog, set the **Project language level** field to the `SDK default` option.
-1. After that, locate the `src/main/java/rem/Rem.java` file, right-click it, and choose `Run Rem.main()` (if the code editor is showing compile errors, try restarting the IDE). If the setup is correct, you should see something like the below as the output:
-   ```
-    ____
-   |  _ \    ___    _ __ ___
-   | |_) |  / _ \  | '_ ` _ \
-   |  _ <  |  __/  | | | | | |
-   |_| \_\  \___|  |_| |_| |_|
-   ```
-
-**Warning:** Keep the `src\main\java` folder as the root folder for Java files (i.e., don't rename those folders or move Java files to another folder outside of this folder path), as this is the default location some tools (e.g., Gradle) expect to find Java files.
-
-## Rem's personality
-
-Rem speaks as a helpful companion, with short first-person replies and occasional nap references.
-Empty lists and searches explain what happened; storage errors clearly identify unsaved changes.
-The original list introduction, missing-description message, and 200-character note-limit message
-are retained.
-
-The interface uses powder-blue controls, a turquoise focus border, and bottom-right anchored artwork.
-A small helper illustration appears while there are no tasks. After 45 seconds without interaction,
-Rem's portrait dims and shows zZ; typing, clicking, pressing a key, or scrolling wakes it immediately.
-The idle state never delays commands.
+```powershell
+.\gradlew.bat runConsole
+```
