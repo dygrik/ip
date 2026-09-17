@@ -1,12 +1,13 @@
-# Rem
+# RemBot
 
-This is a greenfield Java project for the chatbot Rem. Given below are instructions on how to use it.
+RemBot is a task-tracking chatbot product. Its assistant, Rem, helps users manage their tasks.
+Given below are instructions on how to use RemBot.
 
 ## Running RemBot
 
 Use Java 25 and run `.\gradlew.bat run` to open the JavaFX chat window.
 Send a command with Enter or the Send button. Tasks are saved in `data/rem.txt`
-relative to the directory where you launch Rem. Existing console commands also work
+relative to the directory where you launch RemBot. Existing console commands also work
 in the GUI, including `todo`, `deadline`, `event`, `list`, `mark`, `unmark`,
 `delete`, `note`, `deletenote`, `find`, `on`, and `bye`. Add a note while creating a task
 with `/note`, or use `note TASK_NUMBER NOTE` afterward. See the
@@ -22,7 +23,7 @@ restores your unfinished draft. History lasts for the current session and skips 
 duplicates. Invalid commands, task numbers, deadlines, and events include recovery examples.
 
 Build the runnable JAR with `.\gradlew.bat shadowJar`, then run
-`java -jar build/libs/rem.jar`. The bundled JavaFX natives target Windows, macOS,
+`java -jar build/libs/rembot.jar`. The bundled JavaFX natives target Windows, macOS,
 and Linux x64, matching the tutorial setup. Other architectures need matching JavaFX natives.
 For the console interface, use `.\gradlew.bat runConsole` or run `rem.Rem` in the IDE.
 For the GUI in IntelliJ, run `rem.Launcher` after refreshing Gradle.

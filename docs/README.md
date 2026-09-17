@@ -1,7 +1,7 @@
 # RemBot User Guide
 
-RemBot is a task-tracking chatbot for people who prefer typing short commands to navigating menus.
-Its assistant, Rem, can keep todos, deadlines, events, and notes between sessions.
+RemBot is a task-tracking chatbot product for people who prefer typing short commands to navigating
+menus. Its assistant, Rem, can keep todos, deadlines, events, and notes between sessions.
 
 ![RemBot's graphical interface](Ui.png)
 
@@ -12,13 +12,13 @@ Its assistant, Rem, can keep todos, deadlines, events, and notes between session
 ## Quick start
 
 1. Install Java 25.
-2. Download `rem.jar` from the
+2. Download `rembot.jar` from the
    [latest RemBot release](https://github.com/dygrik/ip/releases).
 3. Put the JAR file in a folder where RemBot can keep its saved data.
 4. Open a terminal in that folder and run:
 
    ```text
-   java -jar rem.jar
+   java -jar rembot.jar
    ```
 
 Type a command in the box at the bottom of the window, then press Enter or select **Send**. Use the

@@ -957,7 +957,7 @@ on the JavaFX thread and submits real commands through Send and Enter. It checks
 - Exit disables input and Send.
 
 The console cases above include the new command syntax and recovery hints shared with the GUI.
-Launch the GUI with `gradlew run` or `java -jar build/libs/rem.jar` after `gradlew shadowJar`.
+Launch the GUI with `gradlew run` or `java -jar build/libs/rembot.jar` after `gradlew shadowJar`.
 The artwork is anchored at the bottom right behind a lightly dimmed viewport; message cards stay opaque.
 Rem's circular portrait appears only in the header; commands have no avatar.
 Verify long task lists and notes remain readable at 380 x 400 and 800 x 600.

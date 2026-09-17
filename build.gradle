@@ -63,7 +63,7 @@ jar {
 }
 
 shadowJar {
-    archiveFileName = 'rem.jar'
+    archiveFileName = 'rembot.jar'
     manifest {
         attributes 'Enable-Native-Access': 'ALL-UNNAMED'
     }
